@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
+    <DefineConstants>WINDOWS</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(OS)' == 'Linux'">
+    <DefineConstants>LINUX</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(OS)' == 'Darwin'">
+    <DefineConstants>OSX</DefineConstants>
+  </PropertyGroup>
+</Project>
