@@ -4,16 +4,7 @@
 
 ## Estructura del proyecto
 
-VictorBaseDotNET/
-│── src/
-│   ├── interop/              # Contiene las definiciones de funciones nativas
-│   │   └── NativeMethods.cs   # Enlace directo a las funciones C nativas con DllImport
-│   ├── victorbase/           # Código de nivel más alto que abstrae la interacción con la librería nativa
-│── test/                     # Pruebas de integración y unitarias
-│── VictorBaseDotNET.csproj       # Archivo de proyecto de .NET
-│── VictorBaseDotNET.sln          # Solución principal
-│── Directory.Build.props     # Configuración para compatibilidad multiplataforma
-│── README.md                 # Este archivo
+![Estructura actual](Assets\fot2.png)
 
 
 - Pendiente de generar docs
