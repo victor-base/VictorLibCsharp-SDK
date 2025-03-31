@@ -32,7 +32,7 @@
 //
 // Note: Any changes made to the native functions in the core database (C/C++) must also be reflected here, 
 // ensuring consistency between the C# and C/C++ implementations.
- 
+
 // --- Contact Information ---
 // If you have any questions or suggestions, feel free to contact me at:
 // Email: ivanrwcm25@gmail.com
@@ -69,7 +69,7 @@
 //
 // Nota: Es importante que cualquier cambio en las funciones nativas en el núcleo de la base de datos (C/C++) se refleje también aquí, 
 // manteniendo la coherencia entre ambas implementaciones (C# y C/C++).
- 
+
 // --- Información de contacto ---
 // Por cualquier duda, sugerencia o consulta, contactar a:
 // Email: ivanrwcm25@gmail.com
@@ -89,7 +89,10 @@ static class NativeMethods
         "libvictor.dylib";
 #else
     throw new PlatformNotSupportedException("Unsupported OS -- SO no soportado.");
+
 #endif
+
+// LLamada a funciones del core. --  Call Low level functions.
 
     [DllImport(LIB_NAME, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr alloc_index(int type, int method, ushort dims, IntPtr icontext);
