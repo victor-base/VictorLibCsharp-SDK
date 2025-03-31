@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework> <!-- Puedes cambiar a otra versión si es necesario -->
+    <PlatformTarget>x64</PlatformTarget>  <!-- Asegúrate de que sea compatible con tu sistema (x64 o x86) -->
+    <OutputType>Library</OutputType>      <!-- Esto es porque estamos creando un binding para una librería -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier> <!-- O el sistema operativo específico que uses -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Referencia a la librería nativa .dll -->
+     <None Include="..\..\path\to\victorbase.dll">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+
+
+    <!-- Si tienes otras dependencias, las puedes agregar aquí -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Referencias a otros proyectos si los tienes -->
+    <ProjectReference Include="..\victorbase\victorbase.csproj" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="Build">
+    <Exec Command="echo Post-build action for native interop" />
+    <!-- Aquí puedes poner comandos que se ejecuten después de la construcción, si es necesario -->
+  </Target>
+
+</Project>
