@@ -4,7 +4,7 @@
 
 ## Estructura del proyecto
 
-![Estructura actual](Assets\fot2.png)
+![Estructura actual](Assets/fot2.png)
 
 
 - Pendiente de generar docs
