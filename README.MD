@@ -7,4 +7,5 @@
 ![Estructura actual](Assets/fot2.png)
 
 
-- Pendiente de generar docs
+- Pendiente de generar más docs en los archivos fuente
+- Pendiente abrir los primeros issues en cuanto estén otras implementaciones y la estructura final deiseñada.
