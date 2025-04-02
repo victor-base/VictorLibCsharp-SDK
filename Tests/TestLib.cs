@@ -11,14 +11,14 @@ public class TestLoadLibrary
     {
         try
         {
-            string libraryName = @"D:\Users\pc\Desktop\VictorCsharpBinding-SDK\Lib\libvictor.dll";  // Ruta completa de la DLL
+            string libraryName = @"D:\Users\pc\Desktop\VictorCsharpBinding-SDK\libvictorTEST.dll";  // Ruta completa de la DLL
 
-            Console.WriteLine($"Intentando cargar la biblioteca: {libraryName}");
+            Console.WriteLine($"\nIntentando cargar la biblioteca: {libraryName}\n");
 
             // Verificar si la biblioteca existe
             if (!File.Exists(libraryName))
             {
-                Console.WriteLine($"Error: El archivo DLL no existe en la ruta especificada: {libraryName}");
+                Console.WriteLine($"\nError: El archivo DLL no existe en la ruta especificada: {libraryName}\n");
                 return;
             }
 
@@ -26,20 +26,20 @@ public class TestLoadLibrary
 
             if (libraryHandle == IntPtr.Zero)
             {
-                Console.WriteLine("No se pudo cargar la biblioteca.");
+                Console.WriteLine("\nNo se pudo cargar la biblioteca.\n");
             }
             else
             {
-                Console.WriteLine("Biblioteca cargada correctamente.");
+                Console.WriteLine("\nBiblioteca cargada correctamente.\n");
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error al cargar la librería: {ex.Message}");
+            Console.WriteLine($"\n Error al cargar la librería: {ex.Message}\n");
         }
     }
 
-    // Declaración de la función LoadLibrary de kernel32.dll
+    // Declaración de la función LoadLibrary de kernel32.dll. No se que carajo hace.
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
     private static extern IntPtr LoadLibrary(string lpFileName);
 }
