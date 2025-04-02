@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("VictorBaseDotNET")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+157aa2d320ff4df15449e368ad0d328412fb59c0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b01563ecd6e16485f2dcb9ef8b92d16789d332b8")]
 [assembly: System.Reflection.AssemblyProductAttribute("VictorBaseDotNET")]
 [assembly: System.Reflection.AssemblyTitleAttribute("VictorBaseDotNET")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

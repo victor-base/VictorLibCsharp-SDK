@@ -1,18 +1,17 @@
 using LibTest;
 using TestFunc;
 using VictorNative;
+using VictorSDK;
+using System;
+using Src.Common;
+using TestFuncionalFinal;
 
-class Program
+
+
+internal class Program
 {
-    static void Main(string[] args)
-    {
-        // Ejecutamos todas las pruebas desde TestRunner
-        // TestRunner.RunTests();
-
-        // var Lib = new TestLoadLibrary();
-
-        // TestLoadLibrary.LibLoader();
-
-        TestBinding.TestAllocIndex();
+    internal static void Main(string[] args)
+    { 
+        TestFinal.RunTest();
     }
 }
