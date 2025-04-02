@@ -1,0 +1,11 @@
+D:\Users\pc\Desktop\VictorCsharpBinding-SDK\bin\Debug\netstandard2.1\Lib\libvictor.dll
+D:\Users\pc\Desktop\VictorCsharpBinding-SDK\bin\Debug\netstandard2.1\VictorBaseDotNET.deps.json
+D:\Users\pc\Desktop\VictorCsharpBinding-SDK\bin\Debug\netstandard2.1\VictorBaseDotNET.dll
+D:\Users\pc\Desktop\VictorCsharpBinding-SDK\bin\Debug\netstandard2.1\VictorBaseDotNET.pdb
+D:\Users\pc\Desktop\VictorCsharpBinding-SDK\obj\Debug\netstandard2.1\VictorBaseDotNET.GeneratedMSBuildEditorConfig.editorconfig
+D:\Users\pc\Desktop\VictorCsharpBinding-SDK\obj\Debug\netstandard2.1\VictorBaseDotNET.AssemblyInfoInputs.cache
+D:\Users\pc\Desktop\VictorCsharpBinding-SDK\obj\Debug\netstandard2.1\VictorBaseDotNET.AssemblyInfo.cs
+D:\Users\pc\Desktop\VictorCsharpBinding-SDK\obj\Debug\netstandard2.1\VictorBaseDotNET.csproj.CoreCompileInputs.cache
+D:\Users\pc\Desktop\VictorCsharpBinding-SDK\obj\Debug\netstandard2.1\VictorBaseDotNET.sourcelink.json
+D:\Users\pc\Desktop\VictorCsharpBinding-SDK\obj\Debug\netstandard2.1\VictorBaseDotNET.dll
+D:\Users\pc\Desktop\VictorCsharpBinding-SDK\obj\Debug\netstandard2.1\VictorBaseDotNET.pdb
