@@ -11,7 +11,7 @@
 	<!-- Incluir las librerías nativas según el sistema operativo -->
 	<ItemGroup>
 		<!-- Copiar solo el archivo DLL directamente -->
-		<None Include="libvictor.dll" Condition="'$(OS)' == 'Windows_NT'">
+		<None Include="libvictorTEST.dll" Condition="'$(OS)' == 'Windows_NT'">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
@@ -20,7 +20,7 @@
 	<!-- Acción después de la construcción -->
 	<Target Name="PostBuild" AfterTargets="Build">
 		<Exec Command="echo Verificando si la DLL está copiada en la subcarpeta" />
-		<Exec Command="dir $(OutDir)libvictor.dll" />
+		<Exec Command="dir $(OutDir)libvictorTEST.dll" />
 	</Target>
 
 
