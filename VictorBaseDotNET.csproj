@@ -1,61 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework> <!-- Puedes cambiar a otra versión si es necesario -->
-    <PlatformTarget>x64</PlatformTarget>  <!-- Asegúrate de que sea compatible con tu sistema (x64 o x86) -->
-    <OutputType>Library</OutputType>      <!-- Esto es porque estamos creando un binding para una librería -->
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier> <!-- O el sistema operativo específico que uses -->
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<PlatformTarget>x64</PlatformTarget>
+		<!-- Define si es compatible con x64 o x86 -->
+		<OutputType>Exe</OutputType>
+		<!-- Cambia de Library a Exe para ejecutar el Main -->
+	</PropertyGroup>
 
-  <ItemGroup>
-    <!-- Referencia a la librería nativa .dll -->
-     <None Include="..\..\path\to\victorbase.dll">
-    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-  </None>
-
-
-    <!-- Si tienes otras dependencias, las puedes agregar aquí -->
-  </ItemGroup>
-
-  <ItemGroup>
-    <!-- Referencias a otros proyectos si los tienes -->
-    <ProjectReference Include="..\victorbase\victorbase.csproj" />
-  </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="Build">
-    <Exec Command="echo Post-build action for native interop" />
-    <!-- Aquí puedes poner comandos que se ejecuten después de la construcción, si es necesario -->
-  </Target>
-
-</Project>
-
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework> <!-- Puedes cambiar a otra versión si es necesario -->
-    <PlatformTarget>x64</PlatformTarget>  <!-- Asegúrate de que sea compatible con tu sistema (x64 o x86) -->
-    <OutputType>Library</OutputType>      <!-- Esto es porque estamos creando un binding para una librería -->
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier> <!-- O el sistema operativo específico que uses -->
-  </PropertyGroup>
-
-  <ItemGroup>
-    <!-- Referencia a la librería nativa .dll -->
-     <None Include="..\..\path\to\victorbase.dll">
-    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-  </None>
+	<!-- Incluir las librerías nativas según el sistema operativo -->
+	<ItemGroup>
+		<!-- Copiar solo el archivo DLL directamente -->
+		<None Include="libvictorTEST.dll" Condition="'$(OS)' == 'Windows_NT'">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
 
-    <!-- Si tienes otras dependencias, las puedes agregar aquí -->
-  </ItemGroup>
+	<!-- Acción después de la construcción -->
+	<Target Name="PostBuild" AfterTargets="Build">
+		<Exec Command="echo Verificando si la DLL está copiada en la subcarpeta" />
+		<Exec Command="dir $(OutDir)libvictorTEST.dll" />
+	</Target>
 
-  <ItemGroup>
-    <!-- Referencias a otros proyectos si los tienes -->
-    <ProjectReference Include="..\victorbase\victorbase.csproj" />
-  </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="Build">
-    <Exec Command="echo Post-build action for native interop" />
-    <!-- Aquí puedes poner comandos que se ejecuten después de la construcción, si es necesario -->
-  </Target>
 
 </Project>
