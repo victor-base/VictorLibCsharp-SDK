@@ -11,11 +11,11 @@ public class TestLoadLibrary
     {
         try
         {
-            string libraryName = @"D:\Users\pc\Desktop\VictorCsharpBinding-SDK\libvictorTEST.dll";  // Ruta completa de la DLL
+            string libraryName = @"D:\Users\pc\Desktop\VictorCsharpBinding-SDK\libvictorTEST.dll";  // Ruta completa de la DLL hardcodeada (solo para testear)
 
             Console.WriteLine($"\nIntentando cargar la biblioteca: {libraryName}\n");
 
-            // Verificar si la biblioteca existe
+            // Verificar si la dll existe
             if (!File.Exists(libraryName))
             {
                 Console.WriteLine($"\nError: El archivo DLL no existe en la ruta especificada: {libraryName}\n");

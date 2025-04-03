@@ -7,13 +7,13 @@ namespace TestFunc
     {
         public static void TestAllocIndex()
         {
-            Console.WriteLine("\n Probando alloc_index... \n");
+            Console.WriteLine("\n Probando alloc_inde\n");
 
             // Parámetros de prueba:
             int type = 0;  // Tipo genérico
             int method = 1; // Método de prueba
-            ushort dims = 128; // Dimensiones
-            IntPtr icontext = IntPtr.Zero; // Sin contexto adicional
+            ushort dims = 128; // Dimensiones del vectorcito
+            IntPtr icontext = IntPtr.Zero; 
 
             // Llamada al binding:
             IntPtr index = NativeMethods.alloc_index(type, method, dims, icontext);
