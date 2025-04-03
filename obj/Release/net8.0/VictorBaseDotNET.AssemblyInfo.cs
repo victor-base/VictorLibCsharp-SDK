@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("VictorBaseDotNET")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b01563ecd6e16485f2dcb9ef8b92d16789d332b8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+98127f139854f21a090482e0cf7d1db43cd5cc8a")]
 [assembly: System.Reflection.AssemblyProductAttribute("VictorBaseDotNET")]
 [assembly: System.Reflection.AssemblyTitleAttribute("VictorBaseDotNET")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

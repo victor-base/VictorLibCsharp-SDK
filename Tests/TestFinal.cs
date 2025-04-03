@@ -7,7 +7,7 @@ namespace TestFuncionalFinal
 {
     public static class TestFinal
     {
-        // Método personalizado para ejecutar el test
+        
         public static void RunTest()
         {
             using (var victor = new Victor(0, 1, 128, IntPtr.Zero))
@@ -30,7 +30,7 @@ namespace TestFuncionalFinal
                 victor.Delete(id1);
                 Console.WriteLine($"\nVector con ID {id1} eliminado.\n");
 
-                // Intentar buscar el vector nuevamente (debería fallar)
+                
                 try
                 {
                     result = victor.Search(vector1, 128);
