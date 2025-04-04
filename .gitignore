@@ -1,3 +1,29 @@
-*/vs
-*/bin
-*/obj
+# Archivos de compilación
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+
+# Dependencias
+packages/
+*.nupkg
+project.lock.json
+project.assets.json
+
+# Configuración de Visual Studio
+.vs/
+*.suo
+*.user
+*.sln.docstates
+
+# Caché y logs
+*.log
+*.cache
+*.pidb
+.DS_Store
+
+# Archivos sensibles
+secrets.json
+.env
+appsettings.json
