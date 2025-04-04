@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v8.0": {
-      "VictorBaseDotNET/1.0.0": {
+      "VictorBaseDotNET/1.0.3-beta": {
         "runtime": {
           "VictorBaseDotNET.dll": {}
         }
@@ -14,7 +14,7 @@
     }
   },
   "libraries": {
-    "VictorBaseDotNET/1.0.0": {
+    "VictorBaseDotNET/1.0.3-beta": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

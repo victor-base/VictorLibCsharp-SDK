@@ -12,10 +12,10 @@
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
-    "version": "1.0.0",
+    "version": "1.0.3-beta",
     "restore": {
       "projectUniqueName": "D:\\Users\\pc\\Desktop\\VictorCsharpBinding-SDK\\VictorBaseDotNET.csproj",
-      "projectName": "VictorBaseDotNET",
+      "projectName": "VictorLib",
       "projectPath": "D:\\Users\\pc\\Desktop\\VictorCsharpBinding-SDK\\VictorBaseDotNET.csproj",
       "packagesPath": "C:\\Users\\pc\\.nuget\\packages\\",
       "outputPath": "D:\\Users\\pc\\Desktop\\VictorCsharpBinding-SDK\\obj\\",

@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>VictorLib</id>
+    <version>1.0.0-beta</version>
+    <authors>Iván Rodriguez</authors>
+    <license type="expression">GPL-3.0-or-later</license>
+    <licenseUrl>https://licenses.nuget.org/GPL-3.0-or-later</licenseUrl>
+    <projectUrl>https://github.com/victor-base/VictorCsharpBinding-SDK</projectUrl>
+    <description>VictorBinding is a C# binding for Victor's native library,
+			providing interop with native functionality for high-performance applications.
+
+			Copyright (c) 2024 Iván Rodriguez. Licensed under GPL-3. Contact: ivanrwcm25@gmail.com</description>
+    <releaseNotes>This package is an independent contribution to Victor's core library.
+			Original project by emiliano.billi@gmail.com.</releaseNotes>
+    <copyright>© 2025 Iván E. Rodriguez. Todos los derechos reservados.</copyright>
+    <tags>csharp nuget VictorSDK API VectorDataBase database vector ia IA</tags>
+    <repository type="git" url="https://github.com/victor-base/VictorCsharpBinding-SDK" commit="d683a35d323d4d4f0489a7080c45e860cf02b9c6" />
+    <dependencies>
+      <group targetFramework="net8.0" />
+    </dependencies>
+    <contentFiles>
+      <files include="any/net8.0/bin/Debug/net8.0/VictorBaseDotNET.dll" buildAction="None" />
+    </contentFiles>
+  </metadata>
+  <files>
+    <file src="D:\Users\pc\Desktop\VictorCsharpBinding-SDK\bin\Debug\net8.0\VictorBaseDotNET.dll" target="lib\net8.0\VictorBaseDotNET.dll" />
+    <file src="D:\Users\pc\Desktop\VictorCsharpBinding-SDK\bin\Debug\net8.0\VictorBaseDotNET.dll" target="content\bin\Debug\net8.0\VictorBaseDotNET.dll" />
+    <file src="D:\Users\pc\Desktop\VictorCsharpBinding-SDK\bin\Debug\net8.0\VictorBaseDotNET.dll" target="contentFiles\any\net8.0\bin\Debug\net8.0\VictorBaseDotNET.dll" />
+    <file src="D:\Users\pc\Desktop\VictorCsharpBinding-SDK\libvictorTEST2.dll" target="runtimes\win-x64\native\libvictorTEST2.dll" />
+  </files>
+</package>

@@ -23,7 +23,7 @@ using System.IO;
 
 namespace LibTest
 {
-public class TestLoadLibrary
+internal class TestLoadLibrary
 {
     public static void LibLoader()
     {

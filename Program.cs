@@ -19,7 +19,7 @@
 using LibTest;
 using TestFunc;
 using VictorNative;
-using VictorSDK;
+using Victor;
 using System;
 using Src.Common;
 using TestFuncionalFinal;
