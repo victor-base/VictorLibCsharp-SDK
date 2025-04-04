@@ -11,7 +11,7 @@
     "/home/ivanr013/.nuget/packages/": {}
   },
   "project": {
-    "version": "1.0.1-beta",
+    "version": "1.0.3-beta",
     "restore": {
       "projectUniqueName": "D:\\Users\\pc\\Desktop\\VictorCsharpBinding-SDK\\VictorBaseDotNET.csproj",
       "projectName": "VictorLib",
