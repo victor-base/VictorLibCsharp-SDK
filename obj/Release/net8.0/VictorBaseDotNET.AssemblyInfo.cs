@@ -11,13 +11,20 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("VictorBaseDotNET")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("Independent Contributor")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
-[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+98127f139854f21a090482e0cf7d1db43cd5cc8a")]
+[assembly: System.Reflection.AssemblyCopyrightAttribute("© 2025 Iván E. Rodriguez. Todos los derechos reservados. -- © 2025 Iván E. Rodrig" +
+    "uez. All rights Reserved")]
+[assembly: System.Reflection.AssemblyDescriptionAttribute("\n\t\t\tVictor is a C# binding for Victor Base native library,\n\t\t\tproviding interop w" +
+    "ith native functionality for high-performance applications in .NET Enviroment.\n\n" +
+    "\t\t\tCopyright (c) 2024 Iván Rodriguez. Licensed under GPL-3. Contact: ivanrwcm25@" +
+    "gmail.com\n\t\t")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.1.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.1-beta+d683a35d323d4d4f0489a7080c45e860cf02b9c6")]
 [assembly: System.Reflection.AssemblyProductAttribute("VictorBaseDotNET")]
 [assembly: System.Reflection.AssemblyTitleAttribute("VictorBaseDotNET")]
-[assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
+[assembly: System.Reflection.AssemblyVersionAttribute("1.0.1.0")]
+[assembly: System.Reflection.AssemblyMetadataAttribute("RepositoryUrl", "https://github.com/victor-base/VictorCsharpBinding-SDK")]
 
 // Generado por la clase WriteCodeFragment de MSBuild.
 

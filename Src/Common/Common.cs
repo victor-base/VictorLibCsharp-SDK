@@ -25,7 +25,7 @@ namespace Src.Common
    
     [StructLayout(LayoutKind.Sequential)]
     
-    public struct MatchResult
+    internal struct MatchResult
     {
         public int Id;
         public float Distance;

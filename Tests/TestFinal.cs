@@ -21,17 +21,17 @@
 
 using System;
 using VictorNative;
-using VictorSDK;
+using Victor;
 using Src.Common;
 
 namespace TestFuncionalFinal
 {
-    public static class TestFinal
+    internal static class TestFinal
     {
         
         public static void RunTest()
         {
-            using (var victor = new Victor(0, 1, 128, IntPtr.Zero))
+            using (var victor = new VictorSDK(0, 1, 128, IntPtr.Zero))
             {
                 // Insertar vectores en el índice
                 ulong id1 = 1;

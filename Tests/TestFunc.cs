@@ -21,7 +21,7 @@ using VictorNative;
 
 namespace TestFunc
 {
-    public static class TestBinding
+    internal static class TestBinding
     {
         public static void TestAllocIndex()
         {
