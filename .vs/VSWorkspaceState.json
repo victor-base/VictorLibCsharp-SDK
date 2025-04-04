@@ -9,6 +9,6 @@
     "\\Src\\InterOp\\VictorSDK",
     "\\Tests"
   ],
-  "SelectedNode": "\\Src\\InterOp\\VictorNative.cs",
+  "SelectedNode": "\\Src\\InterOp\\VictorSDK\\VictorLib.cs",
   "PreviewInSolutionExplorer": false
 }

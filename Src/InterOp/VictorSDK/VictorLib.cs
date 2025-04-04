@@ -21,12 +21,12 @@ using System.Runtime.InteropServices;
 using VictorNative;
 using Src.Common;
 
-namespace VictorSDK
+namespace Victor
 {
     /// <summary>
     /// Clase principal para interactuar con el índice nativo. Proporciona funcionalidad de inserción, búsqueda y eliminación de vectores.
     /// </summary>
-    public class Victor : IDisposable
+    public class VictorSDK : IDisposable
     {
         private IntPtr _index; // Puntero al índice nativo
         private bool _disposedFlag; // Flag para evitar liberar más de una vez la memoria.
@@ -39,17 +39,17 @@ namespace VictorSDK
         /// <param name="dims">Número de dimensiones del índice.</param>
         /// <param name="context">Contexto opcional. Se deja como puntero nulo por defecto.</param>
         /// <exception cref="InvalidOperationException">Se lanza si el índice no puede ser inicializado.</exception>
-        public Victor(int type, int method, ushort dims, IntPtr context = default)
+        public VictorSDK(int type, int method, ushort dims, IntPtr context = default)
         {
-            Console.WriteLine("\nInicializando índice...\n");
+            
             _index = NativeMethods.alloc_index(type, method, dims, context);
 
             if (_index == IntPtr.Zero)
             {
-                throw new InvalidOperationException($"\nError al asignar el índice: tipo={type}, método={method}, dims={dims}\n");
+                throw new InvalidOperationException($"\nErr to initilice index: type={type}, method={method}, dims={dims}\n");
             }
 
-            Console.WriteLine("\nÍndice inicializado correctamente.\n");
+            Console.WriteLine("\nIndex created succesfully.\n");
         }
 
         /// <summary>
@@ -64,17 +64,17 @@ namespace VictorSDK
         public int Insert(ulong id, float[] vector, ushort dims)
         {
             if (_index == IntPtr.Zero)
-                throw new InvalidOperationException("\nEl índice no está inicializado.\n");
+                throw new InvalidOperationException("\nIndex not created.\n");
 
             if (vector.Length != dims)
-                throw new ArgumentException($"\nEl tamaño del vector ({vector.Length}) no coincide con las dimensiones especificadas ({dims}).\n");
+                throw new ArgumentException($"\nVector size ({vector.Length}) doesn't match with dimensions :({dims}).\n");
 
             int status = NativeMethods.insert(_index, id, vector, dims);
 
             if (status != 0)
-                throw new InvalidOperationException($"\nError al insertar el vector: código de estado {status}\n");
+                throw new InvalidOperationException($"\nErr with vector insert. status code: {status}\n");
 
-            Console.WriteLine($"\nVector con ID {id} insertado correctamente.\n");
+            Console.WriteLine($"\nVector with ID {id} inserted succesfully.\n");
             return status;
         }
 
@@ -89,10 +89,10 @@ namespace VictorSDK
         public MatchResult Search(float[] vector, ushort dims)
         {
             if (_index == IntPtr.Zero)
-                throw new InvalidOperationException("\nÍndice no inicializado.\n");
+                throw new InvalidOperationException("\nIndex not created.\n");
 
             if (vector.Length != dims)
-                throw new ArgumentException($"\nEl tamaño del vector ({vector.Length}) no coincide con las dimensiones dadas ({dims}).\n");
+                throw new ArgumentException($"\nVector size ({vector.Length}) doesn't match with dimensions :({dims}).\n");
 
             IntPtr resultPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(MatchResult)));
 
@@ -100,7 +100,7 @@ namespace VictorSDK
             {
                 int status = NativeMethods.search(_index, vector, dims, resultPtr);
                 if (status != 0)
-                    throw new InvalidOperationException($"\nError en la búsqueda: código de estado {status}\n");
+                    throw new InvalidOperationException($"\nErr in search: status code: {status}\n");
 
                 MatchResult result = Marshal.PtrToStructure<MatchResult>(resultPtr);
                 return result;
@@ -129,7 +129,7 @@ namespace VictorSDK
 
                 if (status != 0)
                 {
-                    throw new InvalidOperationException($"\nError en la búsqueda: código de estado {status}\n");
+                    throw new InvalidOperationException($"\nERR in search. status code: {status}\n");
                 }
 
                 MatchResult[] results = new MatchResult[n];
@@ -156,14 +156,14 @@ namespace VictorSDK
         public int Delete(ulong id)
         {
             if (_index == IntPtr.Zero)
-                throw new InvalidOperationException("\nÍndice no inicializado.\n");
+                throw new InvalidOperationException("\nIndex not created.\n");
 
             int status = NativeMethods.delete(_index, id);
 
             if (status != 0)
-                throw new InvalidOperationException($"\nError al eliminar el vector con ID {id}: código de estado {status}\n");
+                throw new InvalidOperationException($"\nERR: Can't eliminate vector with ID: {id}. status code: {status}\n");
 
-            Console.WriteLine($"\nVector con ID {id} eliminado correctamente.\n");
+            Console.WriteLine($"\nVector with ID: {id} eliminated succesfully.\n");
             return status;
         }
 
@@ -188,6 +188,7 @@ namespace VictorSDK
                 {
                     NativeMethods.destroy_index(ref _index);
                     _index = IntPtr.Zero;
+                    Console.WriteLine("Elements Destroyed succesfully.");
                 }
 
                 _disposedFlag = true;
@@ -197,7 +198,7 @@ namespace VictorSDK
         /// <summary>
         /// Destructor: fallback en caso de que Dispose no sea invocado.
         /// </summary>
-        ~Victor()
+        ~VictorSDK()
         {
             Dispose(false);
             Console.WriteLine("\nSecurity fallback on.");
