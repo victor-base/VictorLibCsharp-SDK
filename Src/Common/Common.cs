@@ -17,12 +17,13 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 using System.Runtime.InteropServices;
+
 namespace Src.Common
 {
    
     [StructLayout(LayoutKind.Sequential)]
     
-    public struct MatchResult
+    internal struct InternalMatchResult
     {
         public int Id;
         public float Distance;
