@@ -24,10 +24,10 @@ using Src.Common;
 namespace Victor
 {
 
-    public class VictorSDK : IDisposable
+    public partial class VictorSDK : IDisposable
     {
-        private IntPtr _index; 
-        private  bool _disposedFlag;
+        private IntPtr _index;
+        private bool _disposedFlag;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VictorSDK"/> class with the specified parameters.
@@ -73,7 +73,7 @@ namespace Victor
         /// </example>
         public VictorSDK(int type, int method, ushort dims, IntPtr context = default)
         {
-            
+
             _index = NativeMethods.alloc_index(type, method, dims, context);
 
             if (_index == IntPtr.Zero)
@@ -397,5 +397,32 @@ namespace Victor
             System.Diagnostics.Debug.WriteLine("\nSecurity fallback on.");
             System.Diagnostics.Debug.WriteLine("Next time don't forget use Dispose() to free memory.\n");
         }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct MatchResult
+    {
+        public int Id;
+        public float Distance;
+
+        internal static MatchResult FromInternal(InternalMatchResult low)
+        {
+            return new MatchResult
+            {
+                Id = low.Id,
+                Distance = low.Distance
+            };
+        }
+    }
+
+    public partial class VictorSDK : IDisposable
+    {
+        public MatchResult LastResult { get; private set; }
+
+        internal VictorSDK(InternalMatchResult lowLevelStruct)
+        {
+            LastResult = MatchResult.FromInternal(lowLevelStruct);
+        }
+
     }
 }

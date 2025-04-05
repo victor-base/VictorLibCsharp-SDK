@@ -84,12 +84,13 @@ How to contribute:
 ### 📜 Créditos y Licencia / Credits & License
 # Español
 
-- Este SDK complementa Victor Base (licenciado bajo GPL-3.0), un proyecto desarrollado por Emiliano A. Billi.
+- Este SDK complementa Victor Base (licenciado bajo GPL-3.0) https://github.com/victor-base, un proyecto desarrollado por Emiliano A. Billi.
 
 - Este SDK también está licenciado bajo GPL-3.0, y su autor es Iván E. Rodríguez.
 
 # English
 
-- This SDK complements Victor Base (licensed under GPL-3.0), a project developed by Emiliano A. Billi.
+- This SDK complements Victor Base (licensed under GPL-3.0) https://github.com/victor-base, a project developed by Emiliano A. Billi.
 
 - This SDK is also licensed under GPL-3.0, and its author is Iván E. Rodríguez.
+
