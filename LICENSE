@@ -1,37 +1,17 @@
-LICENCIA PÚBLICA GENERAL DE GNU  
-Versión 3, 29 de junio de 2007  
+GNU LESSER GENERAL PUBLIC LICENSE
+Version 3, 29 June 2007
 
-Derechos de autor (C) 2025 Iván E. Rodriguez 
+Copyright (C) 2025 Iván E. Rodriguez
 
-Este programa es software libre: puedes redistribuirlo y/o modificarlo  
-bajo los términos de la Licencia Pública General de GNU publicada  
-por la Free Software Foundation, ya sea la versión 3 de la Licencia,  
-o (a tu elección) cualquier versión posterior.  
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-Este programa se distribuye con la esperanza de que sea útil,  
-pero SIN NINGUNA GARANTÍA; incluso sin la garantía implícita de  
-COMERCIABILIDAD o APTITUD PARA UN PROPÓSITO PARTICULAR. Consulta  
-la Licencia Pública General de GNU para más detalles.  
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
 
-Deberías haber recibido una copia de la Licencia Pública General de GNU  
-junto con este programa. Si no, consulta https://www.gnu.org/licenses/.  
-
----
-
-GNU GENERAL PUBLIC LICENSE  
-Version 3, 29 June 2007  
-
-Copyright (C) 2025 Iván E. Rodriguez  
-
-This program is free software: you can redistribute it and/or modify  
-it under the terms of the GNU General Public License as published by  
-the Free Software Foundation, either version 3 of the License, or  
-(at your option) any later version.  
-
-This program is distributed in the hope that it will be useful,  
-but WITHOUT ANY WARRANTY; without even the implied warranty of  
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the  
-GNU General Public License for more details.  
-
-You should have received a copy of the GNU General Public License  
-along with this program. If not, see https://www.gnu.org/licenses/.  
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
