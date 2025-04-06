@@ -8,12 +8,12 @@
 
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>VictorLib</PackageId>
-		<Version>1.0.4-beta</Version>
+		<Version>1.0.5-beta</Version>
 		<Authors>Iván Rodriguez</Authors>
 		<Company>Independent Contributor</Company>
 		<Description>Victor is a C# binding SDK for Victor Base native library, providing interop with native functionality for high-performance applications in .NET Enviroment. Copyright (c) 2024 Iván Rodriguez. Licensed under GPL-3. Contact: ivanrwcm25@gmail.com</Description>
 		<Copyright>© 2025 Iván E. Rodriguez. Todos los derechos reservados. -- © 2025 Iván E. Rodriguez. All rights Reserved</Copyright>
-		<PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+		<PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
 		<PackageTags>csharp;nuget;VictorSDK;API;VectorDataBase;database;vector;ia;IA</PackageTags>
 		<PackageProjectUrl>https://github.com/victor-base/VictorCsharpBinding-SDK</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/victor-base/VictorCsharpBinding-SDK</RepositoryUrl>
