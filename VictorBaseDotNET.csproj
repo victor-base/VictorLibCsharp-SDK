@@ -23,16 +23,16 @@
 		</PackageReleaseNotes>
 		<RepositoryType>git</RepositoryType>
 		<Tags>csharp binding native interop SDK Ia</Tags>
+		<PackageIcon>victor.png</PackageIcon>
 	</PropertyGroup>
 
 
 	<ItemGroup>
-		
-		<None Include="$(OutputPath)VictorBaseDotNET.dll" Pack="true" />
 		<None Include="libvictorTEST2.dll" Pack="true">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<PackagePath>runtimes/win-x64/native/</PackagePath>
 		</None>
+			 <None Include="victor.png" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
 
