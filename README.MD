@@ -1,4 +1,4 @@
-# Victor Base C# Binding & SDK - INDEV Beta 1.0.5
+# Victor Base C# Binding & SDK - INDEV Beta 1.0.6
 
 ## Descripción / Description
 - **Español:** VictorNative es el binding de interoperabilidad en C# para la librería nativa Victor Base, proporcionando acceso eficiente a sus funcionalidades de indexación y búsqueda.
@@ -93,10 +93,11 @@ How to contribute:
 - This SDK complements Victor Base (licensed under GPL-3.0) https://github.com/victor-base, a project developed by Emiliano A. Billi.
 
 - This SDK is also licensed under GPL-3.0, and its author is Iván E. Rodríguez.
+---
 
-### licencia
+### License
+- This project was developed by Iván Ezequiel Rodriguez under the LGPL-3.0 license.
 
-- Este proyecto fue desarrollado por Iván Ezequiel Rodriguez, bajo la licencia LGPL-3.0.
-
-- Se permite su uso tanto en proyectos de código abierto como en proyectos comerciales y privados, siempre que se respeten los términos de la licencia. Para consultas o soporte técnico directo, consultar: ivanrwcm25@gmail.com o mas info del desarrollador en: https://ivanrodportolio.netlify.app/
-
+- Its use is permitted in both open-source and commercial/private projects, as long as the terms of the license are respected.
+- For inquiries or direct technical support, contact: ivanrwcm25@gmail.com
+  More information about the developer: https://ivanrodportolio.netlify.app/
