@@ -77,22 +77,22 @@ namespace VictorNative
     internal static class NativeMethods
     {
 
-        [DllImport("libvictorTEST2.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("libvictorTEST3.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr alloc_index(int type, int method, ushort dims, IntPtr icontext);
 
-        [DllImport("libvictorTEST2.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("libvictorTEST3.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int destroy_index(ref IntPtr index);
 
-        [DllImport("libvictorTEST2.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("libvictorTEST3.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int search_n(IntPtr index, float[] vector, ushort dims, IntPtr results, int n);
 
-        [DllImport("libvictorTEST2.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("libvictorTEST3.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int search(IntPtr index, float[] vector, ushort dims, IntPtr result);
 
-        [DllImport("libvictorTEST2.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("libvictorTEST3.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int insert(IntPtr index, ulong id, float[] vector, ushort dims);
 
-        [DllImport("libvictorTEST2.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("libvictorTEST3.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int delete(IntPtr index, ulong id);
 
     }
