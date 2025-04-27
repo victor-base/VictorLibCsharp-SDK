@@ -10,8 +10,11 @@ on:
 
 # Separate jobs for each OS
 jobs:
-  build-and-test-windows:
-    runs-on: windows-latest
+  build-and-test:
+    strategy:
+      matrix:
+        os: [windows-latest] # Solo Windows por ahora, pero puedes añadir otros si lo necesitas
+    runs-on: ${{ matrix.os }}
 
     steps:
     - name: Checkout code
@@ -26,12 +29,15 @@ jobs:
       run: dotnet restore ./VictorBaseDotNET.csproj
 
     - name: Build solution
-      run: dotnet build --no-restore --configuration Release
+      run: dotnet build ./VictorBaseDotNET.csproj --no-restore --configuration Release
 
     - name: Run tests
-      run: dotnet test --no-build --configuration Release --verbosity normal
-
+      run: dotnet test ./VictorBaseDotNET.csproj --no-build --configuration Release --verbosity normal
+      
+      
+         
   build-and-test-ubuntu:
+    if: false # Cambia a true si queres habilitar el job para Ubuntu
     runs-on: ubuntu-latest
 
     steps:
@@ -53,6 +59,7 @@ jobs:
       run: dotnet test --no-build --configuration Release --verbosity normal
 
   build-and-test-macos:
+    if: false # Cambia a true si queres habilitar el job para MacOS
     runs-on: macos-latest
 
     steps:
