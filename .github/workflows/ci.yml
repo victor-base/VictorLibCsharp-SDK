@@ -8,11 +8,13 @@ on:
     branches:
       - master
 
-runs-on: [windows-latest, ubuntu-latest, macos-latest]
-
+# Separate jobs for each OS
 jobs:
   build-and-test:
-    runs-on: windows-latest
+    strategy:
+      matrix:
+        os: [windows-latest] # Solo Windows por ahora, pero puedes añadir otros si lo necesitas
+    runs-on: ${{ matrix.os }}
 
     steps:
     - name: Checkout code
@@ -24,7 +26,53 @@ jobs:
         dotnet-version: 8.0
 
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore ./VictorBaseDotNET.csproj
+
+    - name: Build solution
+      run: dotnet build ./VictorBaseDotNET.csproj --no-restore --configuration Release
+
+    - name: Run tests
+      run: dotnet test ./VictorBaseDotNET.csproj --no-build --configuration Release --verbosity normal
+      
+      
+         
+  build-and-test-ubuntu:
+    if: false # Cambia a true si queres habilitar el job para Ubuntu
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0
+
+    - name: Restore dependencies
+      run: dotnet restore ./VictorBaseDotNET.csproj
+
+    - name: Build solution
+      run: dotnet build --no-restore --configuration Release
+
+    - name: Run tests
+      run: dotnet test --no-build --configuration Release --verbosity normal
+
+  build-and-test-macos:
+    if: false # Cambia a true si queres habilitar el job para MacOS
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0
+
+    - name: Restore dependencies
+      run: dotnet restore ./VictorBaseDotNET.csproj
 
     - name: Build solution
       run: dotnet build --no-restore --configuration Release
