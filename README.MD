@@ -1,8 +1,8 @@
 # Victor Base C# Binding & SDK - INDEV Beta 1.0.10 (Pendiente de refactor)
 
 ## Descripción / Description
-- **Español:** VictorNative es el binding de interoperabilidad en C# para la librería nativa Victor Base, proporcionando acceso eficiente a sus funcionalidades de indexación y búsqueda.
-- **English:** VictorNative is the C# interoperability binding for the native Victor library, providing efficient access to its indexing and search functionalities.
+- **Español:** VictorLib es el SDK de interoperabilidad en C# para la librería nativa Victor Base, proporcionandote acceso eficiente a sus funcionalidades de indexación y búsqueda, etc.
+- **English:** VictorLib is the C# interoperability SDK for the native Victor library, providing efficient access to its indexing and search functionalities.
 
 ---
 
