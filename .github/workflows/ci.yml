@@ -8,6 +8,8 @@ on:
     branches:
       - master
 
+runs-on: [windows-latest, ubuntu-latest, macos-latest]
+
 jobs:
   build-and-test:
     runs-on: windows-latest
