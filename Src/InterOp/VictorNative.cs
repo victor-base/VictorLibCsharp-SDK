@@ -74,28 +74,45 @@ using System.Runtime.InteropServices;
 
 namespace VictorNative
 {
-    internal static class NativeMethods
-    {
+  internal static class NativeMethods
+  {
 
-        [DllImport("libvictorTEST3.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr alloc_index(int type, int method, ushort dims, IntPtr icontext);
+    [DllImport("libvictorTEST4.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr alloc_index(int type, int method, ushort dims, IntPtr icontext);
 
-        [DllImport("libvictorTEST3.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int destroy_index(ref IntPtr index);
+    [DllImport("libvictorTEST4.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern int destroy_index(ref IntPtr index);
 
-        [DllImport("libvictorTEST3.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int search_n(IntPtr index, float[] vector, ushort dims, IntPtr results, int n);
+    [DllImport("libvictorTEST4.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern int search_n(IntPtr index, float[] vector, ushort dims, IntPtr results, int n);
 
-        [DllImport("libvictorTEST3.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int search(IntPtr index, float[] vector, ushort dims, IntPtr result);
+    [DllImport("libvictorTEST4.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern int search(IntPtr index, float[] vector, ushort dims, IntPtr result);
 
-        [DllImport("libvictorTEST3.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int insert(IntPtr index, ulong id, float[] vector, ushort dims);
+    [DllImport("libvictorTEST4.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern int insert(IntPtr index, ulong id, float[] vector, ushort dims);
 
-        [DllImport("libvictorTEST3.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int delete(IntPtr index, ulong id);
+    [DllImport("libvictorTEST4.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern int delete(IntPtr index, ulong id);
 
-    }
+    [DllImport("libvictorTEST4.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern int update_icontext(IntPtr index, IntPtr icontext);
+
+    [DllImport("libvictorTEST4.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern int stats(IntPtr index, IntPtr stats);
+
+    [DllImport("libvictorTEST4.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern int size(IntPtr index, out ulong sz);
+
+    [DllImport("libvictorTEST4.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern int dump(IntPtr index, string filename);
+
+    [DllImport("libvictorTEST4.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern int contains(IntPtr index, ulong id);
+
+    [DllImport("libvictorTEST4.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr load_index(string filename);
+  }
 
 
 }

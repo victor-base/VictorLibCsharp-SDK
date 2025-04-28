@@ -5,14 +5,20 @@
 		<PlatformTarget>x64</PlatformTarget>
 		<OutputType>Library</OutputType>
 		<DebugType>portable</DebugType>
-
+		<IncludeBuildOutput>true</IncludeBuildOutput>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>VictorLib</PackageId>
-		<Version>1.0.7-beta</Version>
+		<Version>1.0.10-beta</Version>
 		<Authors>Iván Rodriguez</Authors>
 		<Company>Independent Contributor</Company>
-		<Description>VictorLib is a C# binding SDK for Victor Base native library, providing interop with native functionality for high-performance applications in .NET Environment. The package enables vector database manipulation (e.g.,search , search_n, alloc_index, destroy_index) for scalable and efficient computation and AI apps. Licensed under LGPL-3. Contact: ivanrwcm25@gmail.com.</Description>
-		<Copyright>© 2025 Iván E. Rodriguez. Todos los derechos reservados. -- © 2025 Iván E. Rodriguez. All rights Reserved</Copyright>
+		<Description>VictorLib is a C# binding SDK for Victor Base native library, providing interop
+			with native functionality for high-performance applications in .NET Environment. The
+			package enables vector database manipulation (e.g.,search , search_n, alloc_index,
+			destroy_index) for scalable and efficient computation and AI apps. Licensed under
+			LGPL-3. Contact: ivanrwcm25@gmail.com.</Description>
+		<Copyright>© 2025 Iván E. Rodriguez. Todos los derechos reservados. -- © 2025 Iván E.
+			Rodriguez. All rights Reserved</Copyright>
 		<PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
 		<PackageTags>csharp;nuget;VictorSDK;API;VectorDataBase;database;vector;ia;IA</PackageTags>
 		<PackageProjectUrl>https://github.com/victor-base/VictorCsharpBinding-SDK</PackageProjectUrl>
@@ -24,20 +30,31 @@
 		<RepositoryType>git</RepositoryType>
 		<Tags>csharp binding native interop SDK Ia</Tags>
 		<PackageIcon>victor.png</PackageIcon>
+		<AssemblyName>VictorSDK</AssemblyName>
+		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+
 	</PropertyGroup>
 
 
 	<ItemGroup>
-		<None Include="libvictorTEST3.dll" Pack="true">
+		<InternalsVisibleTo Include="VictorSDK" />
+		<None Include="libvictorTEST4.dll" Pack="true">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<PackagePath>runtimes/win-x64/native/</PackagePath>
 		</None>
-			 <None Include="victor.png" Pack="true" PackagePath="\" />
+		<None Include="victor.png" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<PackageReference Include="Castle.Core" Version="5.3.0" />
+		<PackageReference Include="xunit" Version="2.9.3" />
+		<PackageReference Include="xunit.abstractions" Version="2.0.3" />
 	</ItemGroup>
 
 
 	<Target Name="PostBuild" AfterTargets="Build">
-		<Exec Command="dir $(OutDir)libvictorTEST3.dll" />
+		<Exec Command="dir $(OutDir)libvictorTEST4.dll" />
 	</Target>
 
 </Project>

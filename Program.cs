@@ -17,14 +17,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-
-using LibTest;
-using TestFunc;
-using VictorNative;
-using Victor;
-using System;
-using Src.Common;
 using TestFuncionalFinal;
 
 
