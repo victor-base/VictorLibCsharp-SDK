@@ -13,7 +13,7 @@ jobs:
   build-and-test:
     strategy:
       matrix:
-        os: [windows-latest] # Solo Windows por ahora, pero puedes añadir otros si lo necesitas
+        os: [windows-latest] # Solo Windows por ahora.
     runs-on: ${{ matrix.os }}
 
     steps:
