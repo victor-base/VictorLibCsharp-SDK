@@ -20,15 +20,47 @@
 
 using System.Runtime.InteropServices;
 
-namespace Src.Common
+namespace VictorBaseDotNET.Src.Common;
+
+
+[StructLayout(LayoutKind.Sequential)]
+
+internal struct InternalMatchResult
 {
-   
-    [StructLayout(LayoutKind.Sequential)]
-    
-    internal struct InternalMatchResult
-    {
-        public int Id;
-        public float Distance;
-    }
+    public int Id;
+    public float Distance;
+}
+
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct NSWContext
+{
+    public int EfSearch;
+    public int EfConstruct;
+    public int Odegree;
+}
+
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct TimeStat
+{
+    public ulong Count;
+    public double Total;
+    public double Last;
+    public double Min;
+    public double Max;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+public struct InternalIndexStatsResult
+{
+    public ulong InsertCount;
+    public ulong DeleteCount;
+    public ulong SearchCount;
+    public ulong SearchNCount;
+    public double TotalTime;
+    public double LastOperationTime;
+    public double MinOperationTime;
+    public double MaxOperationTime;
 
 }

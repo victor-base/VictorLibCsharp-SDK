@@ -21,9 +21,8 @@
 
 
 using System;
-using VictorNative;
 using Victor;
-using Src.Common;
+using VictorBaseDotNET.Src.Common;
 
 namespace TestFuncionalFinal
 {
@@ -46,7 +45,7 @@ namespace TestFuncionalFinal
 
                 // Buscar el vector
                 MatchResult result = victor.Search(vector1, 128);
-                Console.WriteLine($"\nResultado de búsqueda: ID = {result.Id}, Distancia = {result.Distance}\n");
+                Console.WriteLine($"\nResultado de búsqueda: ID = {result.MatchId}, Distancia = {result.MatchData}\n");
 
                 // Eliminar el vector
                 victor.Delete(id1);
@@ -56,7 +55,7 @@ namespace TestFuncionalFinal
                 try
                 {
                     result = victor.Search(vector1, 128);
-                    Console.WriteLine($"\nResultado de búsqueda tras eliminar: ID = {result.Id}, Distancia = {result.Distance}\n");
+                    Console.WriteLine($"\nResultado de búsqueda tras eliminar: ID = {result.MatchId}, Distancia = {result.MatchData}\n");
                 }
                 catch (Exception ex)
                 {
