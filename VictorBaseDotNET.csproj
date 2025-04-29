@@ -47,7 +47,7 @@
 
 
 	<ItemGroup>
-		<PackageReference Include="Castle.Core" Version="5.3.0" />
+		<PackageReference Include="Castle.Core" Version="5.2.1" />
 		<PackageReference Include="xunit" Version="2.9.3" />
 		<PackageReference Include="xunit.abstractions" Version="2.0.3" />
 	</ItemGroup>
