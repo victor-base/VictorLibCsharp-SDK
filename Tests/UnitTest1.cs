@@ -1,9 +1,9 @@
-﻿using System;
-using Xunit;
+﻿using Xunit;
 using Victor;
 using VictorBaseDotNET.Src.Common;
 
 
+namespace VictorBaseDotNET.Tests;
 public class VictorSDKTests
 {
     [Fact]
