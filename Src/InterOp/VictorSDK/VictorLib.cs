@@ -36,10 +36,8 @@ public partial class VictorSDK : IDisposable
     {
         _index = NativeMethods.alloc_index(type, method, dims, context);
 
-        if (_index == IntPtr.Zero)
-        {
-            throw new InvalidOperationException($"\nErr to initilice index: type={type}, method={method}, dims={dims}\n");
-        }
+        if (_index == IntPtr.Zero) throw new InvalidOperationException($"\nErr to initilice index: type={type}, method={method}, dims={dims}\n");
+        
 
         System.Diagnostics.Debug.WriteLine("\nIndex created succesfully.\n");
     }
@@ -53,16 +51,13 @@ public partial class VictorSDK : IDisposable
 
     public int Insert(ulong id, float[] vector, ushort dims)
     {
-        if (_index == IntPtr.Zero)
-            throw new InvalidOperationException("\nIndex not created.\n");
+        if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
 
-        if (vector.Length != dims)
-            throw new ArgumentException($"\nVector size ({vector.Length}) doesn't match with dimensions :({dims}).\n");
+        if (vector.Length != dims) throw new ArgumentException($"\nVector size ({vector.Length}) doesn't match with dimensions :({dims}).\n");
 
         int status = NativeMethods.insert(_index, id, vector, dims);
 
-        if (status != 0)
-            throw new InvalidOperationException($"\nErr with vector insert. status code: {status}\n");
+        if (status != 0) throw new InvalidOperationException($"\nErr with vector insert. status code: {status}\n");
 
         System.Diagnostics.Debug.WriteLine($"\nVector with ID {id} inserted succesfully.\n");
         return status;
@@ -72,19 +67,16 @@ public partial class VictorSDK : IDisposable
 
     public MatchResult Search(float[] vector, ushort dims)
     {
-        if (_index == IntPtr.Zero)
-            throw new InvalidOperationException("\nIndex not created.\n");
+        if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
 
-        if (vector.Length != dims)
-            throw new ArgumentException($"\nVector size ({vector.Length}) doesn't match with dimensions :({dims}).\n");
+        if (vector.Length != dims) throw new ArgumentException($"\nVector size ({vector.Length}) doesn't match with dimensions :({dims}).\n");
 
         IntPtr resultPtr = Marshal.AllocHGlobal(Marshal.SizeOf<InternalMatchResult>());
 
         try
         {
             int status = NativeMethods.search(_index, vector, dims, resultPtr);
-            if (status != 0)
-                throw new InvalidOperationException($"\nErr in search: status code: {status}\n");
+            if (status != 0) throw new InvalidOperationException($"\nErr in search: status code: {status}\n");
 
             InternalMatchResult internalResult = Marshal.PtrToStructure<InternalMatchResult>(resultPtr);
             MatchResult result = StructMapper.Map<MatchResult, InternalMatchResult>(internalResult);
@@ -99,19 +91,16 @@ public partial class VictorSDK : IDisposable
 
     public MatchResult[] Search_n(float[] vector, ushort dims, int n)
     {
-        if (_index == IntPtr.Zero)
-            throw new InvalidOperationException("\nIndex not created.\n");
+        if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
 
-        if (vector.Length != dims)
-            throw new ArgumentException($"\nVector size ({vector.Length}) doesn't match with dimensions :({dims}).\n");
+        if (vector.Length != dims) throw new ArgumentException($"\nVector size ({vector.Length}) doesn't match with dimensions :({dims}).\n");
 
         IntPtr resultsPtr = Marshal.AllocHGlobal(Marshal.SizeOf<InternalMatchResult>() * n);
 
         try
         {
             int status = NativeMethods.search_n(_index, vector, dims, resultsPtr, n);
-            if (status != 0)
-                throw new InvalidOperationException($"\nERR in search. status code: {status}\n");
+            if (status != 0) throw new InvalidOperationException($"\nERR in search. status code: {status}\n");
 
             MatchResult[] results = StructMapper.MapArray<MatchResult, InternalMatchResult>(resultsPtr, n);
 
@@ -128,16 +117,14 @@ public partial class VictorSDK : IDisposable
 
     public IndexStatsResult GetStats()
     {
-        if (_index == IntPtr.Zero)
-            throw new InvalidOperationException("\nIndex not created.\n");
+        if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
 
         IntPtr statsPtr = Marshal.AllocHGlobal(Marshal.SizeOf<IndexStatsResult>());
 
         try
         {
             int status = NativeMethods.stats(_index, statsPtr);
-            if (status != 0)
-                throw new InvalidOperationException("\nError retrieving index statistics.\n");
+            if (status != 0) throw new InvalidOperationException("\nError retrieving index statistics.\n");
 
             IndexStatsResult stats = Marshal.PtrToStructure<IndexStatsResult>(statsPtr);
             return stats;
