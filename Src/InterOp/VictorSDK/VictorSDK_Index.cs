@@ -45,12 +45,11 @@ public partial class VictorSDK
 	/// </remarks>
 	public void UpdateIndexContext(IntPtr icontext)
 	{
-		if (_index == IntPtr.Zero)
-			throw new InvalidOperationException("\nIndex not created.\n");
+		if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
 
 		int status = NativeMethods.update_icontext(_index, icontext);
-		if (status != 0)
-			throw new InvalidOperationException("\nError updating index context.\n");
+		
+		if (status != 0) throw new InvalidOperationException("\nError updating index context.\n");
 
 		System.Diagnostics.Debug.WriteLine("\nIndex context updated successfully.\n");
 	}
@@ -68,12 +67,10 @@ public partial class VictorSDK
 	/// </remarks>
 	public void DumpIndex(string filename)
 	{
-		if (_index == IntPtr.Zero)
-			throw new InvalidOperationException("\nIndex not created.\n");
+		if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
 
 		int status = NativeMethods.dump(_index, filename);
-		if (status != 0)
-			throw new InvalidOperationException($"\nError dumping index to file: {filename}\n");
+		if (status != 0) throw new InvalidOperationException($"\nError dumping index to file: {filename}\n");
 
 		System.Diagnostics.Debug.WriteLine($"\nIndex dumped successfully to {filename}.\n");
 	}
@@ -92,9 +89,8 @@ public partial class VictorSDK
 	/// </remarks>
 	public bool Contains(ulong id)
 	{
-		if (_index == IntPtr.Zero)
-			throw new InvalidOperationException("\nIndex not created.\n");
-
+		if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
+		
 		int result = NativeMethods.contains(_index, id);
 		return result == 1;
 	}
@@ -111,13 +107,11 @@ public partial class VictorSDK
 	/// </remarks>
 	public ulong GetSize()
 	{
-		if (_index == IntPtr.Zero)
-			throw new InvalidOperationException("\nIndex not created.\n");
+		if (_index == IntPtr.Zero) 	throw new InvalidOperationException("\nIndex not created.\n");
 
 		int status = NativeMethods.size(_index, out ulong size);
-		if (status != 0)
-			throw new InvalidOperationException("\nError retrieving index size.\n");
-
+		if (status != 0) throw new InvalidOperationException("\nError retrieving index size.\n");
+			
 		return size;
 	}
 
@@ -135,9 +129,8 @@ public partial class VictorSDK
 	public static VictorSDK LoadIndex(string filename)
 	{
 		IntPtr index = NativeMethods.load_index(filename);
-		if (index == IntPtr.Zero)
-			throw new InvalidOperationException($"\nError loading index from file: {filename}\n");
-
+		if (index == IntPtr.Zero) throw new InvalidOperationException($"\nError loading index from file: {filename}\n");
+			
 		return new VictorSDK(index);
 	}
 
@@ -155,13 +148,11 @@ public partial class VictorSDK
 	/// </remarks>
 	public int Delete(ulong id)
 	{
-		if (_index == IntPtr.Zero)
-			throw new InvalidOperationException("\nIndex not created.\n");
+		if (_index == IntPtr.Zero)	throw new InvalidOperationException("\nIndex not created.\n");
 
 		int status = NativeMethods.delete(_index, id);
 
-		if (status != 0)
-			throw new InvalidOperationException($"\nERR: Can't eliminate vector with ID: {id}. status code: {status}\n");
+		if (status != 0) throw new InvalidOperationException($"\nERR: Can't eliminate vector with ID: {id}. status code: {status}\n");
 
 		System.Diagnostics.Debug.WriteLine($"\nVector with ID: {id} eliminated succesfully.\n");
 		return status;
