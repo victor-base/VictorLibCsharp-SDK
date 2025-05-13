@@ -16,38 +16,112 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *  Este es el SDK de Victor. Estos son todos los métodos que, como usuario, deberías poder usar. 
+ *  La clase esta fragmentada en partes para que sea más fácil de leer. (aún hay que mejorar la legibilidad)
+ *
  */
 
 
 using System;
 using System.Runtime.InteropServices;
-using VictorNative;
 using VictorBaseDotNET.Src.Common;
+using VictorBaseDotNET.Src.utils;
+using NativeMethodsInterface;
+using Victor.NativeMethods.Factory;
+using System.Diagnostics;
+using VictorExceptions;
 
 namespace Victor;
 
 public partial class VictorSDK : IDisposable
 {
+    private readonly INativeMethods _native;
     private IntPtr _index;
     private bool _disposedFlag;
 
-
-    public VictorSDK(int type, int method, ushort dims, IntPtr context = default)
+    public VictorSDK(IndexType type, DistanceMethod method, ushort dims, HNSWContext? context = null)
     {
-        _index = NativeMethods.alloc_index(type, method, dims, context);
+        _native = NativeMethodsFactory.Create() ?? throw new InvalidOperationException("Native methods could not be initialized.");
 
-        if (_index == IntPtr.Zero) throw new InvalidOperationException($"\nErr to initilice index: type={type}, method={method}, dims={dims}\n");
-        
+        IntPtr ctxPtr = IntPtr.Zero;
+        if (type == IndexType.HNSW)
+        {
+            if (context == null) throw new InvalidOperationException("HNSW index requires a valid context.");
 
-        System.Diagnostics.Debug.WriteLine("\nIndex created succesfully.\n");
+            ctxPtr = HNSWContext.ToPointer(context.Value);
+        }
+
+        _index = _native.alloc_index(type, method, dims, ctxPtr);
+        Debug.WriteLine($"Index created: {_index}");
+       
+        if (_index == IntPtr.Zero) throw new InvalidOperationException("Error al inicializar el índice.");
     }
+
+
 }
 
 
-
-
-public partial class VictorSDK : IDisposable
+public partial class VictorSDK
 {
+
+    public void UpdateContext(HNSWContext context, int mode)
+    {
+        IntPtr ptr = HNSWContext.ToPointer(context);
+        int status = _native.update_icontext(_index, ptr, mode);
+        Marshal.FreeHGlobal(ptr);
+        ThrowIfError(status);
+    }
+
+    public void InitHNSW(HNSWContext config, int method, ushort dims)
+    {
+        IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf<HNSWContext>());
+        Marshal.StructureToPtr(config, ptr, false);
+
+        int code = _native.hnsw_index(_index, method, dims, ptr);
+        Marshal.FreeHGlobal(ptr);
+
+        ThrowIfError(code);
+    }
+
+
+
+    internal string GetIndexName()
+    {
+        IntPtr ptr = _native.index_name(_index);
+        return Marshal.PtrToStringAnsi(ptr);
+    }
+
+    internal string GetLibraryVersion()
+    {
+        IntPtr ptr = _native.__LIB_VERSION();
+        return Marshal.PtrToStringAnsi(ptr);
+    }
+
+    internal string GetShortVersion()
+    {
+        IntPtr ptr = _native.__LIB_SHORT_VERSION();
+        return Marshal.PtrToStringAnsi(ptr);
+    }
+
+
+    public void PrintDiagnostics()
+    {
+        Console.WriteLine($"Victor Library v{GetLibraryVersion()}");
+        Console.WriteLine($"Index name: {GetIndexName()}");
+        Console.WriteLine($"Index size: {GetSize()}");
+    }
+
+    public void ThrowIfError(int code)
+    {
+        if (code == 0) return;
+
+        IntPtr ptr = _native.victor_strerror((ErrorCode)code);
+        string msg = Marshal.PtrToStringAnsi(ptr);
+
+        throw new VictorException((ErrorCode)code, $"Victor error {code}: {msg}");
+    }
+
 
     public int Insert(ulong id, float[] vector, ushort dims)
     {
@@ -55,11 +129,11 @@ public partial class VictorSDK : IDisposable
 
         if (vector.Length != dims) throw new ArgumentException($"\nVector size ({vector.Length}) doesn't match with dimensions :({dims}).\n");
 
-        int status = NativeMethods.insert(_index, id, vector, dims);
+        int status = _native.insert(_index, id, vector, dims);
 
         if (status != 0) throw new InvalidOperationException($"\nErr with vector insert. status code: {status}\n");
 
-        System.Diagnostics.Debug.WriteLine($"\nVector with ID {id} inserted succesfully.\n");
+        Debug.WriteLine($"\nVector with ID {id} inserted succesfully.\n");
         return status;
     }
 
@@ -75,12 +149,11 @@ public partial class VictorSDK : IDisposable
 
         try
         {
-            int status = NativeMethods.search(_index, vector, dims, resultPtr);
+            int status = _native.search(_index, vector, dims, resultPtr);
             if (status != 0) throw new InvalidOperationException($"\nErr in search: status code: {status}\n");
 
             InternalMatchResult internalResult = Marshal.PtrToStructure<InternalMatchResult>(resultPtr);
-            MatchResult result = StructMapper.Map<MatchResult, InternalMatchResult>(internalResult);
-
+            MatchResult result = StructMapper.Map(internalResult);
             return result;
         }
         finally
@@ -93,24 +166,23 @@ public partial class VictorSDK : IDisposable
     {
         if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
 
-        if (vector.Length != dims) throw new ArgumentException($"\nVector size ({vector.Length}) doesn't match with dimensions :({dims}).\n");
+        if (vector.Length != dims) throw new ArgumentException($"\nVector size ({vector.Length}) doesn't match with dimensions ({dims}).\n");
 
         IntPtr resultsPtr = Marshal.AllocHGlobal(Marshal.SizeOf<InternalMatchResult>() * n);
 
         try
         {
-            int status = NativeMethods.search_n(_index, vector, dims, resultsPtr, n);
-            if (status != 0) throw new InvalidOperationException($"\nERR in search. status code: {status}\n");
+            int status = _native.search_n(_index, vector, dims, resultsPtr, n);
+            if (status != 0) throw new InvalidOperationException($"\nERR in search_n. status code: {status}\n");
 
-            MatchResult[] results = StructMapper.MapArray<MatchResult, InternalMatchResult>(resultsPtr, n);
-
-            return results;
+            return StructMapper.MapArray(resultsPtr, n);
         }
         finally
         {
             Marshal.FreeHGlobal(resultsPtr);
         }
     }
+
 
 
 
@@ -123,10 +195,11 @@ public partial class VictorSDK : IDisposable
 
         try
         {
-            int status = NativeMethods.stats(_index, statsPtr);
+            int status = _native.stats(_index, statsPtr);
             if (status != 0) throw new InvalidOperationException("\nError retrieving index statistics.\n");
 
             IndexStatsResult stats = Marshal.PtrToStructure<IndexStatsResult>(statsPtr);
+            Debug.WriteLine($"Index statistics: {stats}");
             return stats;
         }
         finally
@@ -155,8 +228,8 @@ public partial class VictorSDK : IDisposable
         {
             if (_index != IntPtr.Zero)
             {
-                System.Diagnostics.Debug.WriteLine("Elements Destroyed succesfully.");
-                NativeMethods.destroy_index(ref _index);
+                Debug.WriteLine("Elements Destroyed succesfully.");
+                _native.destroy_index(ref _index);
                 _index = IntPtr.Zero;
             }
 
@@ -164,10 +237,12 @@ public partial class VictorSDK : IDisposable
         }
     }
 
+    // Destructor. Probably not needed, but kept for safety.
+    // It will be called if Dispose() is not called explicitly. which is less probable.
     ~VictorSDK()
     {
         Dispose(false);
-        System.Diagnostics.Debug.WriteLine("\nSecurity fallback on.");
-        System.Diagnostics.Debug.WriteLine("Next time don't forget use Dispose() to free memory.\n");
+        Debug.WriteLine("\nSecurity fallback on.");
+        Debug.WriteLine("Next time don't forget use Dispose() to free memory.\n");
     }
 }

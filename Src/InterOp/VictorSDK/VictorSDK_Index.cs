@@ -18,7 +18,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using System;
-using VictorNative;
 
 namespace Victor;
 
@@ -47,7 +46,7 @@ public partial class VictorSDK
 	{
 		if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
 
-		int status = NativeMethods.update_icontext(_index, icontext);
+		int status = _native.update_icontext(_index, icontext);
 		
 		if (status != 0) throw new InvalidOperationException("\nError updating index context.\n");
 
@@ -69,7 +68,7 @@ public partial class VictorSDK
 	{
 		if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
 
-		int status = NativeMethods.dump(_index, filename);
+		int status = _native.dump(_index, filename);
 		if (status != 0) throw new InvalidOperationException($"\nError dumping index to file: {filename}\n");
 
 		System.Diagnostics.Debug.WriteLine($"\nIndex dumped successfully to {filename}.\n");
@@ -91,7 +90,7 @@ public partial class VictorSDK
 	{
 		if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
 		
-		int result = NativeMethods.contains(_index, id);
+		int result = _native.contains(_index, id);
 		return result == 1;
 	}
 
@@ -109,7 +108,7 @@ public partial class VictorSDK
 	{
 		if (_index == IntPtr.Zero) 	throw new InvalidOperationException("\nIndex not created.\n");
 
-		int status = NativeMethods.size(_index, out ulong size);
+		int status = _native.size(_index, out ulong size);
 		if (status != 0) throw new InvalidOperationException("\nError retrieving index size.\n");
 			
 		return size;
@@ -126,9 +125,9 @@ public partial class VictorSDK
 	/// <remarks>
 	/// ESP: Carga un índice desde un archivo.
 	/// </remarks>
-	public static VictorSDK LoadIndex(string filename)
+	public VictorSDK LoadIndex(string filename)
 	{
-		IntPtr index = NativeMethods.load_index(filename);
+		IntPtr index = _native.load_index(filename);
 		if (index == IntPtr.Zero) throw new InvalidOperationException($"\nError loading index from file: {filename}\n");
 			
 		return new VictorSDK(index);
@@ -150,7 +149,7 @@ public partial class VictorSDK
 	{
 		if (_index == IntPtr.Zero)	throw new InvalidOperationException("\nIndex not created.\n");
 
-		int status = NativeMethods.delete(_index, id);
+		int status = _native.delete(_index, id);
 
 		if (status != 0) throw new InvalidOperationException($"\nERR: Can't eliminate vector with ID: {id}. status code: {status}\n");
 
