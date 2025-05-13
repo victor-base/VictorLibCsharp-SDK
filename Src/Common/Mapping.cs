@@ -16,42 +16,51 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ *   Este archivo toma las structuras internas de la biblioteca nativa y las convierte en estructuras públicas
+ *   para su uso en el SDK de .NET. Esto permite que las estructuras internas sean accesibles y utilizables sin que puedan tomarse desde su código nativo.
  */
 
+using VictorBaseDotNET.Src.utils;
 using System.Runtime.InteropServices;
 using System;
 
 namespace VictorBaseDotNET.Src.Common;
 
 
-public interface IMappableFrom<T>
+public struct PublicAsort
 {
-    void MapFrom(T internalStruct);
+    public IntPtr Heap; // Puntero a la estructura interna de asort
+
+    internal PublicAsort(InternalAsort internalStruct)
+    {
+        Heap = internalStruct.Heap;
+    }
 }
 
 public struct MatchResult
 {
-    public int MatchId;
-    public float MatchData;
+    public int Label;
+    public float Distance;
 
-    internal MatchResult(InternalMatchResult internalStruct) // Constructor interno
+    public MatchResult(InternalMatchResult internalStruct)
     {
-        MatchId = internalStruct.Id;
-        MatchData = internalStruct.Distance;
+        Label = internalStruct.Label;
+        Distance = internalStruct.Distance;
     }
 }
 
 public struct NSWContextResult
 {
-    public int EfSearch;
-    public int EfConstruct;
-    public int Odegree;
+    public int EFSEARCH;
+    public int EF_CONSTRUCT;
+    public int ODEGREE;
 
     internal NSWContextResult(NSWContext internalStruct)
     {
-        EfSearch = internalStruct.EfSearch;
-        EfConstruct = internalStruct.EfConstruct;
-        Odegree = internalStruct.Odegree;
+        EFSEARCH = internalStruct.EFSEARCH;
+        EF_CONSTRUCT = internalStruct.EF_CONSTRUCT;
+        ODEGREE = internalStruct.ODEGREE;
     }
 }
 
@@ -95,28 +104,51 @@ public struct IndexStatsResult
         MinOperationTime = stats.MinOperationTime;
         MaxOperationTime = stats.MaxOperationTime;
     }
-
 }
-
-
-// Clase de mapeo para estructuras internas a estructuras públicas universales
-internal static class StructMapper
+public static class StructMapper
 {
-    public static T Map<T, U>(U internalStruct) where T : struct
+    // Mapea de InternalAsort a PublicAsort
+    internal static PublicAsort MapToPublic(InternalAsort internalAsort)
     {
-        // Usa Activator.CreateInstance para invocar el constructor interno
-        return (T)Activator.CreateInstance(typeof(T), internalStruct);
+        return new PublicAsort(internalAsort);
     }
 
-    public static T[] MapArray<T, U>(IntPtr arrayPtr, int count) where T : struct where U : struct
+    // Mapea de PublicAsort a InternalAsort
+    internal static InternalAsort MapToInternal(PublicAsort asort)
     {
-        T[] results = new T[count];
+        return new InternalAsort { Heap = asort.Heap };
+    }
+
+    // Mapea de InternalAsort a Asort (estructura interop)
+    internal static Asort MapToInterop(InternalAsort internalAsort)
+    {
+        return new Asort { Heap = internalAsort.Heap };
+    }
+
+    // Mapea de Asort (estructura interop) a InternalAsort
+    internal static InternalAsort MapFromInterop(Asort asort)
+    {
+        return new InternalAsort { Heap = asort.Heap };
+    }
+
+    // Mapea de InternalMatchResult a MatchResult
+    public static MatchResult Map(InternalMatchResult internalResult)
+    {
+        return new MatchResult(internalResult);
+    }
+
+    // Mapea un arreglo de InternalMatchResult a MatchResult[]
+    public static MatchResult[] MapArray(IntPtr resultsPtr, int count)
+    {
+        var results = new MatchResult[count];
         for (int i = 0; i < count; i++)
         {
-            IntPtr elementPtr = IntPtr.Add(arrayPtr, i * Marshal.SizeOf<U>());
-            U internalStruct = Marshal.PtrToStructure<U>(elementPtr);
-            results[i] = Map<T, U>(internalStruct);
+            var internalResult = Marshal.PtrToStructure<InternalMatchResult>(
+                IntPtr.Add(resultsPtr, i * Marshal.SizeOf<InternalMatchResult>())
+            );
+            results[i] = Map(internalResult);
         }
         return results;
     }
 }
+
