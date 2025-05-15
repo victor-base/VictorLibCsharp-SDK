@@ -31,6 +31,7 @@ using NativeMethodsInterface;
 using Victor.NativeMethods.Factory;
 using System.Diagnostics;
 using VictorExceptions;
+#nullable enable
 
 namespace Victor;
 
@@ -40,26 +41,21 @@ public partial class VictorSDK : IDisposable
     private IntPtr _index;
     private bool _disposedFlag;
 
-    public VictorSDK(IndexType type, DistanceMethod method, ushort dims, HNSWContext? context = null)
+    public VictorSDK(IndexType type, DistanceMethod method, ushort dims, object? context = null)
     {
-        _native = NativeMethodsFactory.Create() ?? throw new InvalidOperationException("Native methods could not be initialized.");
+        _native = NativeMethodsFactory.Create();
 
         IntPtr ctxPtr = IntPtr.Zero;
-        if (type == IndexType.HNSW)
-        {
-            if (context == null) throw new InvalidOperationException("HNSW index requires a valid context.");
-
-            ctxPtr = HNSWContext.ToPointer(context.Value);
-        }
 
         _index = _native.alloc_index(type, method, dims, ctxPtr);
         Debug.WriteLine($"Index created: {_index}");
-       
-        if (_index == IntPtr.Zero) throw new InvalidOperationException("Error al inicializar el índice.");
+
     }
 
+#nullable disable
 
 }
+
 
 
 public partial class VictorSDK
@@ -70,19 +66,9 @@ public partial class VictorSDK
         IntPtr ptr = HNSWContext.ToPointer(context);
         int status = _native.update_icontext(_index, ptr, mode);
         Marshal.FreeHGlobal(ptr);
-        ThrowIfError(status);
+        ThrowIfError((ErrorCode)status);
     }
 
-    public void InitHNSW(HNSWContext config, int method, ushort dims)
-    {
-        IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf<HNSWContext>());
-        Marshal.StructureToPtr(config, ptr, false);
-
-        int code = _native.hnsw_index(_index, method, dims, ptr);
-        Marshal.FreeHGlobal(ptr);
-
-        ThrowIfError(code);
-    }
 
 
 
@@ -111,27 +97,41 @@ public partial class VictorSDK
         Console.WriteLine($"Index name: {GetIndexName()}");
         Console.WriteLine($"Index size: {GetSize()}");
     }
-
-    public void ThrowIfError(int code)
+    public void PrintDiagnosticsShort()
     {
-        if (code == 0) return;
+        Console.WriteLine($"Victor Library v{GetShortVersion()}");
+        Console.WriteLine($"Index name: {GetIndexName()}");
+        Console.WriteLine($"Index size: {GetSize()}");
+    }
 
-        IntPtr ptr = _native.victor_strerror((ErrorCode)code);
+    public void ThrowIfError(ErrorCode code, int? additionalCode = null)
+    {
+        if (code == ErrorCode.SUCCESS) return; // No hay error, salir del método.
+
+        IntPtr ptr = _native.victor_strerror(code);
         string msg = Marshal.PtrToStringAnsi(ptr);
 
-        throw new VictorException((ErrorCode)code, $"Victor error {code}: {msg}");
+        // Si se proporciona un código adicional, inclúyelo en el mensaje de error.
+        if (additionalCode.HasValue)
+        {
+            throw new VictorException(code, $"Victor error {code} (Additional Code: {additionalCode}): {msg}");
+        }
+        else
+        {
+            throw new VictorException(code, $"Victor error {code}: {msg}");
+        }
     }
 
 
     public int Insert(ulong id, float[] vector, ushort dims)
     {
-        if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
+        if (_index == IntPtr.Zero) throw new VictorException(ErrorCode.INVALID_INIT);
 
-        if (vector.Length != dims) throw new ArgumentException($"\nVector size ({vector.Length}) doesn't match with dimensions :({dims}).\n");
+        if (vector.Length != dims) throw new VictorException(ErrorCode.INVALID_INDEX, $"\nVector size ({vector.Length}) doesn't match with dimensions :({dims}).\n");
 
         int status = _native.insert(_index, id, vector, dims);
 
-        if (status != 0) throw new InvalidOperationException($"\nErr with vector insert. status code: {status}\n");
+        if (status != 0) throw new VictorException($"\nErr with vector insert. status code: {status}\n");
 
         Debug.WriteLine($"\nVector with ID {id} inserted succesfully.\n");
         return status;
@@ -180,13 +180,20 @@ public partial class VictorSDK
         finally
         {
             Marshal.FreeHGlobal(resultsPtr);
+            Debug.WriteLine("Recursos liberados");
         }
     }
 
 
 
 
-
+    /// <summary>
+    /// Obtiene estadísticas agregadas del índice.
+    /// </summary>
+    /// <returns>Una instancia de <see cref="IndexStatsResult"/> con las estadísticas del índice.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// Se lanza si el índice no ha sido creado o si ocurre un error al obtener las estadísticas.
+    /// </exception>
     public IndexStatsResult GetStats()
     {
         if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
@@ -196,7 +203,7 @@ public partial class VictorSDK
         try
         {
             int status = _native.stats(_index, statsPtr);
-            if (status != 0) throw new InvalidOperationException("\nError retrieving index statistics.\n");
+            if (status != 0) throw new VictorException("\nError retrieving index statistics.\n");
 
             IndexStatsResult stats = Marshal.PtrToStructure<IndexStatsResult>(statsPtr);
             Debug.WriteLine($"Index statistics: {stats}");

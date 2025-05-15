@@ -23,46 +23,44 @@
 using System;
 using Victor;
 using VictorBaseDotNET.Src.Common;
+using VictorBaseDotNET.Src.utils;
 
-namespace TestFuncionalFinal
+namespace TestFuncionalFinal;
+
+internal static class TestFinal
 {
-    internal static class TestFinal
+
+    public static void RunTest()
     {
-        
-        public static void RunTest()
-        {
-            using (var victor = new VictorSDK(0, 1, 128, IntPtr.Zero))
-            {
-                // Insertar vectores en el índice
-                ulong id1 = 1;
-                float[] vector1 = new float[128];
-                for (int i = 0; i < vector1.Length; i++)
-                {
-                    vector1[i] = (float)i / vector1.Length;
-                }
-                victor.Insert(id1, vector1, 128);
-                Console.WriteLine($"\nVector con ID {id1} insertado.\n");
+		using var victor = new VictorSDK(IndexType.HNSW, DistanceMethod.EUCLIDIAN, 128, null);
+		// Insertar vectores en el índice
+		ulong id1 = 1;
+		float[] vector1 = new float[128];
+		for (int i = 0; i < vector1.Length; i++)
+		{
+			vector1[i] = (float)i / vector1.Length;
+		}
+		victor.Insert(id1, vector1, 128);
+		Console.WriteLine($"\nVector con ID {id1} insertado.\n");
 
-                // Buscar el vector
-                MatchResult result = victor.Search(vector1, 128);
-                Console.WriteLine($"\nResultado de búsqueda: ID = {result.MatchId}, Distancia = {result.MatchData}\n");
+		// Buscar el vector
+		MatchResult result = victor.Search(vector1, 128);
+		Console.WriteLine($"\nResultado de búsqueda: ID = {result.Label}, Distancia = {result.Distance}\n");
 
-                // Eliminar el vector
-                victor.Delete(id1);
-                Console.WriteLine($"\nVector con ID {id1} eliminado.\n");
+		// Eliminar el vector
+		victor.Delete(id1);
+		Console.WriteLine($"\nVector con ID {id1} eliminado.\n");
 
-                
-                try
-                {
-                    result = victor.Search(vector1, 128);
-                    Console.WriteLine($"\nResultado de búsqueda tras eliminar: ID = {result.MatchId}, Distancia = {result.MatchData}\n");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"\nError en la búsqueda tras eliminar: {ex.Message}\n");
-                }
-            }
 
-        }
-    }
+		try
+		{
+			result = victor.Search(vector1, 128);
+			Console.WriteLine($"\nResultado de búsqueda tras eliminar: ID = {result.Label}, Distancia = {result.Distance}\n");
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"\nError en la búsqueda tras eliminar: {ex.Message}\n");
+		}
+
+	}
 }

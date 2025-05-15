@@ -20,24 +20,27 @@
 
 
 using System;
-using VictorNative;
+using NativeMethodsInterface;
+using Victor.NativeMethods.Factory;
+using VictorBaseDotNET.Src.utils;
 
 namespace TestFunc
 {
     internal static class TestBinding
     {
+        private static readonly INativeMethods _native = NativeMethodsFactory.Create();
         public static void TestAllocIndex()
         {
             Console.WriteLine("\n Probando alloc_inde\n");
 
             // Parámetros de prueba:
-            int type = 0;  // Tipo genérico
-            int method = 1; // Método de prueba
+            IndexType type = IndexType.FLAT;  // Tipo genérico
+            DistanceMethod method = DistanceMethod.DOTPROD; // Método de prueba
             ushort dims = 128; // Dimensiones del vectorcito
             IntPtr icontext = IntPtr.Zero; 
 
             // Llamada al binding:
-            IntPtr index = NativeMethods.alloc_index(type, method, dims, icontext);
+            IntPtr index = _native.alloc_index(type, method, dims, icontext);
 
             // Verifica el resultado:
             if (index != IntPtr.Zero)
@@ -61,7 +64,7 @@ namespace TestFunc
             // Verificar que el índice existe antes de liberarlo
             if (index != IntPtr.Zero)
             {
-                int result = NativeMethods.destroy_index(ref index);
+                int result = _native.destroy_index(ref index);
 
                 if (result == 0)
                 {

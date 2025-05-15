@@ -32,13 +32,19 @@
 		<PackageIcon>victor.png</PackageIcon>
 		<AssemblyName>VictorSDK</AssemblyName>
 		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
-
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(RuntimeIdentifier)' == 'win-x64'">
+		<DefineConstants>WINDOWS</DefineConstants>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(RuntimeIdentifier)' == 'linux-x64'">
+		<DefineConstants>LINUX</DefineConstants>
+	</PropertyGroup>
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="VictorSDK" />
-		<None Include="libvictorTEST4.dll" Pack="true">
+		<None Include="libvictor.dll" Pack="true">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<PackagePath>runtimes/win-x64/native/</PackagePath>
 		</None>
@@ -47,14 +53,15 @@
 
 
 	<ItemGroup>
-		<PackageReference Include="Castle.Core" Version="5.2.1" />
-		<PackageReference Include="xunit" Version="2.9.3" />
-		<PackageReference Include="xunit.abstractions" Version="2.0.3" />
+		<PackageReference Include="NUnit" Version="3.14.0" />
+		<PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.4" />
+
 	</ItemGroup>
 
 
 	<Target Name="PostBuild" AfterTargets="Build">
-		<Exec Command="dir $(OutDir)libvictorTEST4.dll" />
+		<Exec Command="dir $(OutDir)libvictor.dll" />
 	</Target>
 
 </Project>

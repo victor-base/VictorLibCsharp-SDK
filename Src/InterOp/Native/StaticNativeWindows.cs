@@ -173,41 +173,11 @@ internal static class NativeMethodsWindowsStatic
 
   [DllImport("libvictor.dll", CallingConvention = CallingConvention.Cdecl)]
   public static extern IntPtr __LIB_VERSION();
-
   [DllImport("libvictor.dll", CallingConvention = CallingConvention.Cdecl)]
   public static extern IntPtr victor_strerror(ErrorCode code);
 
   [DllImport("libvictor.dll", CallingConvention = CallingConvention.Cdecl)]
   public static extern int update_icontext(IntPtr index, IntPtr context, int mode);
-  [DllImport("libvictor.dll", CallingConvention = CallingConvention.Cdecl)]
-  public static extern int flat_index_load(IntPtr index, IntPtr ioContext);
-
-  [DllImport("libvictor.dll", CallingConvention = CallingConvention.Cdecl)]
-  public static extern int hnsw_index_load(IntPtr index, IntPtr ioContext);
-
-  [DllImport("libvictor.dll", CallingConvention = CallingConvention.Cdecl)]
-  public static extern int nsw_index_load(IntPtr index, IntPtr ioContext);
-
-  // --- Estadísticas / tiempo ---
-  [DllImport("libvictor.dll", CallingConvention = CallingConvention.Cdecl)]
-  public static extern int get_time_ms_monotonic();
-
-  // --- Vector Utils ---
-  [DllImport("libvictor.dll", CallingConvention = CallingConvention.Cdecl)]
-  public static extern void normalize_vector([In, Out] float[] vector, ushort dims);
-
-  [DllImport("libvictor.dll", CallingConvention = CallingConvention.Cdecl)]
-  public static extern int nsw_search(IntPtr index, float[] vector, ushort dims, [Out] InternalMatchResult result);
-
-  [DllImport("libvictor.dll", CallingConvention = CallingConvention.Cdecl)]
-  public static extern int nsw_search_n(IntPtr index, float[] vector, ushort dims, [Out] InternalMatchResult[] results, int n);
-
-  // --- Búsqueda HNSW ---
-  [DllImport("libvictor.dll", CallingConvention = CallingConvention.Cdecl)]
-  public static extern int hnsw_search(IntPtr index, float[] vector, ushort dims, [Out] InternalMatchResult result);
-
-  [DllImport("libvictor.dll", CallingConvention = CallingConvention.Cdecl)]
-  public static extern int hnsw_search_n(IntPtr index, float[] vector, ushort dims, [Out] InternalMatchResult[] results, int n);
 
 }
 

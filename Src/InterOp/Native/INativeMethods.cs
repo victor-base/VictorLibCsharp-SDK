@@ -37,15 +37,6 @@ internal interface INativeMethods
 	IntPtr load_index(string filename);
 	IntPtr __LIB_VERSION();
 	IntPtr __LIB_SHORT_VERSION();
-	int hnsw_search_n(IntPtr index, float[] vector, ushort dims, [Out] InternalMatchResult[] results, int n);
-	int hnsw_search(IntPtr index, float[] vector, ushort dims, [Out] InternalMatchResult result);
-	int nsw_search_n(IntPtr index, float[] vector, ushort dims, [Out] InternalMatchResult[] results, int n);
-	int nsw_search(IntPtr index, float[] vector, ushort dims, [Out] InternalMatchResult result);
-	int flat_index_load(IntPtr index, IntPtr ioContext);
-	int hnsw_index_load(IntPtr index, IntPtr ioContext);
-	int nsw_index_load(IntPtr index, IntPtr ioContext);
-	int get_time_ms_monotonic();
-	int hnsw_index(IntPtr idx, int method, ushort dims, IntPtr context);
 	int destroy_index(ref IntPtr index);
 	int search_n(IntPtr index, float[] vector, ushort dims, IntPtr results, int n);
 	int search(IntPtr index, float[] vector, ushort dims, IntPtr results);
@@ -60,5 +51,5 @@ internal interface INativeMethods
 	int dump(IntPtr index, string filename);
 	int contains(IntPtr index, ulong id);
 	int update_icontext(IntPtr index, IntPtr context, int mode);
-	void normalize_vector([In, Out] float[] vector, ushort dims);
+	
 }

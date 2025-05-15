@@ -49,16 +49,6 @@ internal class NativeMethodsWindows : INativeMethods
     public int dump(IntPtr index, string filename) => NativeMethodsWindowsStatic.dump(index, filename);
     public int contains(IntPtr index, ulong id) => NativeMethodsWindowsStatic.contains(index, id);
     public int update_icontext(IntPtr index, IntPtr context, int mode) => NativeMethodsWindowsStatic.update_icontext(index, context, mode);
-    public int hnsw_index(IntPtr idx, int method, ushort dims, IntPtr context) => NativeMethodsWindowsStatic.hnsw_index(idx, method, dims, context);
-    public void normalize_vector([In, Out] float[] vector, ushort dims) => NativeMethodsWindowsStatic.normalize_vector(vector, dims);
-    public int get_time_ms_monotonic() => NativeMethodsWindowsStatic.get_time_ms_monotonic();
-    public int nsw_index_load(IntPtr index, IntPtr ioContext) => NativeMethodsWindowsStatic.nsw_index_load(index, ioContext);
-    public int hnsw_index_load(IntPtr index, IntPtr ioContext) => NativeMethodsWindowsStatic.nsw_index_load(index, ioContext);
-    public int flat_index_load(IntPtr index, IntPtr ioContext) => NativeMethodsWindowsStatic.flat_index_load(index, ioContext);
-    public int nsw_search(IntPtr index, float[] vector, ushort dims, [Out] InternalMatchResult result) => NativeMethodsWindowsStatic.nsw_search(index, vector, dims, result);
-    public int nsw_search_n(IntPtr index, float[] vector, ushort dims, [Out] InternalMatchResult[] results, int n) => NativeMethodsWindowsStatic.nsw_search_n(index, vector, dims, results, n);
-    public int hnsw_search(IntPtr index, float[] vector, ushort dims, [Out] InternalMatchResult result) => NativeMethodsWindowsStatic.hnsw_search(index, vector, dims, result);
-    public int hnsw_search_n(IntPtr index, float[] vector, ushort dims, [Out] InternalMatchResult[] results, int n) => NativeMethodsWindowsStatic.hnsw_search_n(index, vector, dims, results, n);
     public IntPtr load_index(string filename) => NativeMethodsWindowsStatic.load_index(filename);
     public IntPtr __LIB_SHORT_VERSION() => NativeMethodsWindowsStatic.__LIB_SHORT_VERSION();
     public IntPtr __LIB_VERSION() => NativeMethodsWindowsStatic.__LIB_VERSION();
