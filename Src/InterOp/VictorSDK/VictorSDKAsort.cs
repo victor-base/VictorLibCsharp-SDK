@@ -1,6 +1,7 @@
 using System;
 using VictorBaseDotNET.Src.Common;
 using VictorBaseDotNET.Src.utils;
+using VictorExceptions;
 
 namespace Victor;
 
@@ -70,7 +71,7 @@ public MatchResult[] CloseAsort(ref PublicAsort asort, int n, bool extractResult
     InternalMatchResult[] internalOutputs = extractResults ? new InternalMatchResult[n] : null;
     int result = _native.as_close(ref internalAsort, internalOutputs, n);
 
-    if (result < 0) throw new Exception($"as_close failed with code {result}");
+    if (result < 0) throw new VictorException($"as_close failed with code {result}");
 
     asort = StructMapper.MapToPublic(StructMapper.MapFromInterop(internalAsort)); // ✅ simplificado
 

@@ -32,11 +32,10 @@ public struct PublicAsort
 {
     public IntPtr Heap; // Puntero a la estructura interna de asort
 
-    internal PublicAsort(InternalAsort internalStruct)
-    {
-        Heap = internalStruct.Heap;
-    }
+    internal PublicAsort(InternalAsort internalStruct) => Heap = internalStruct.Heap;
+
 }
+
 
 public struct MatchResult
 {
@@ -84,28 +83,27 @@ public struct TimeStatResult
 
 public struct IndexStatsResult
 {
-    public ulong InsertCount;
-    public ulong DeleteCount;
-    public ulong SearchCount;
-    public ulong SearchNCount;
-    public double TotalTime;
-    public double LastOperationTime;
-    public double MinOperationTime;
-    public double MaxOperationTime;
+    internal TimeStat Insert;
+    internal TimeStat Delete; // O Remove, dependiendo del entorno
+    internal TimeStat Dump;
+    internal TimeStat Search;
+    internal TimeStat SearchN;
 
     internal IndexStatsResult(InternalIndexStatsResult stats)
     {
-        InsertCount = stats.InsertCount;
-        DeleteCount = stats.DeleteCount;
-        SearchCount = stats.SearchCount;
-        SearchNCount = stats.SearchNCount;
-        TotalTime = stats.TotalTime;
-        LastOperationTime = stats.LastOperationTime;
-        MinOperationTime = stats.MinOperationTime;
-        MaxOperationTime = stats.MaxOperationTime;
+        Insert = stats.Insert;
+        Delete = stats.Delete;
+        Search = stats.Search;
+        Dump = stats.Dump;
+        SearchN = stats.SearchN;
     }
+
+    public override string ToString() =>
+
+     $"Insert: {Insert.Count}, Delete: {Delete.Count}, Dump: {Dump.Count}, Search: {Search.Count}, SearchN: {SearchN.Count}";
+      
 }
-public static class StructMapper
+internal static class StructMapper
 {
     // Mapea de InternalAsort a PublicAsort
     internal static PublicAsort MapToPublic(InternalAsort internalAsort)
@@ -132,7 +130,7 @@ public static class StructMapper
     }
 
     // Mapea de InternalMatchResult a MatchResult
-    public static MatchResult Map(InternalMatchResult internalResult)
+    internal static MatchResult Map(InternalMatchResult internalResult)
     {
         return new MatchResult(internalResult);
     }
@@ -150,5 +148,23 @@ public static class StructMapper
         }
         return results;
     }
+    // Mapea de InternalIndexStatsResult a IndexStatsResult
+    internal static IndexStatsResult MapStats(InternalIndexStatsResult internalStats)
+    {
+        return new IndexStatsResult(internalStats);
+    }
+    // Mapea de IndexStatsResult a InternalIndexStatsResult
+    internal static InternalIndexStatsResult MapToInternal(IndexStatsResult stats)
+    {
+        return new InternalIndexStatsResult
+        {
+            Insert = stats.Insert,
+            Delete = stats.Delete,
+            Dump = stats.Dump,
+            Search = stats.Search,
+            SearchN = stats.SearchN
+        };
+    }
+
 }
 
