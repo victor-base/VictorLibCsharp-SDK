@@ -22,6 +22,7 @@ project.assets.json
 *.cache
 *.pidb
 .DS_Store
+.xml
 
 # Archivos sensibles
 secrets.json

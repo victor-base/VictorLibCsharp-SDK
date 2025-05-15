@@ -27,9 +27,20 @@ jobs:
 
     - name: Restore dependencies
       run: dotnet restore ./VictorBaseDotNET.csproj
+      
+    - name: Compilar libvictor.dll
+      run: |
+      
+       make -f Makefile.win
+      
+      
+    - name: Copiar libvictor.dll al proyecto
+      run: copy libvictor.dll VictorBaseDotNET\
+      shell: cmd
 
     - name: Build solution
-      run: dotnet build ./VictorBaseDotNET.csproj --no-restore --configuration Release
+      run: dotnet build ./VictorBaseDotNET.csproj --no-restore --configuration Release /p:TreatWarningsAsErrors=false
+
 
     - name: Run tests
       run: dotnet test ./VictorBaseDotNET.csproj --no-build --configuration Release --verbosity normal
