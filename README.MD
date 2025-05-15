@@ -1,94 +1,131 @@
-# Victor Base C# Binding & SDK - INDEV Beta 1.0.10 (Pendiente de refactor)
+# Victor Base C# Binding & SDK - INDEV Beta Final 1.0.10
 
 ## Descripción / Description
-- **Español:** VictorLib es el SDK de interoperabilidad en C# para la librería nativa Victor Base, proporcionandote acceso eficiente a sus funcionalidades de indexación y búsqueda, etc.
-- **English:** VictorLib is the C# interoperability SDK for the native Victor library, providing efficient access to its indexing and search functionalities.
+
+- **Español:**  
+  VictorLib es el SDK de interoperabilidad en C# para la librería nativa Victor Base. Permite acceso eficiente a funcionalidades de indexación, búsqueda y gestión de vectores, con una API moderna y segura para .NET.
+
+- **English:**  
+  VictorLib is the C# interoperability SDK for the native Victor Base library. It provides efficient access to indexing, search, and vector management features, with a modern and safe API for .NET.
 
 ---
 
-## Estructura del proyecto / Project File Structure
+## Estructura del proyecto / Project Structure
 
-![Estructura actual / Current Structure](Assets/estructura%20de%20archivos.png)
+```
+Src/
+  Common/
+    Mapping.cs
+    Structs.cs
+  InterOp/
+    Factory/
+      Factory.cs
+    Native/
+      INativeMethods.cs
+      NativeMethodsLinux.cs
+      NativeMethodsWindows.cs
+      StaticNativeLinux.cs
+      StaticNativeWindows.cs
+    VictorExceptions/
+      VictorExceptions.cs
+    VictorSDK/
+      VictorLib.cs
+      VictorSDK_Index.cs
+      VictorSDKAsort.cs
+Tests/
+  UnitTest1.cs
+Examples/
+  (usage examples)
+```
 
-- **Español:**
-  - `InterOp` contiene **VictorSDK**, el archivo fuente del SDK que actúa como capa de abstracción de las funciones nativas.
-  - `InterOp` también incluye **VictorNative.cs**, primera capa de contacto con las funciones del núcleo de la base de datos.
-  - Carpeta `Tests`, dedicada a pruebas unitarias y de usuario.
-  - `Common` contiene archivos fuente reutilizables en distintas partes del proyecto.
-  - `Examples` incluye ejemplos prácticos de uso del SDK.
+- **Español:**  
+  - `InterOp` contiene **VictorSDK**, la capa de abstracción sobre las funciones nativas.
+  - `Common` incluye estructuras y utilidades reutilizables.
+  - `Tests` contiene pruebas unitarias y de integración.
+  - `Examples` incluye ejemplos prácticos de uso.
 
-- **English:**
-  - `InterOp` contains **VictorSDK**, the SDK source file serving as an abstraction layer for native functionalities.
-  - `InterOp` also includes **VictorNative.cs**, the first contact layer with the core database functions.
-  - `Tests` folder: focused on user and unit tests.
-  - `Common` includes reusable source files across different components.
-  - `Examples` contains practical examples of SDK usage.
+- **English:**  
+  - `InterOp` contains **VictorSDK**, the abstraction layer over native functions.
+  - `Common` includes reusable structs and utilities.
+  - `Tests` contains unit and integration tests.
+  - `Examples` provides practical usage examples.
 
 ---
 
-## Métodos disponibles / Available Methods
+## Métodos principales / Main Methods
 
 - **Insert:**  
   - **Español:** Inserta un vector en el índice con un ID único.  
-  - **English:** Adds a vector to the index using a unique ID.  
+  - **English:** Adds a vector to the index using a unique ID.
 
 - **Search:**  
-  - **Español:** Realiza una búsqueda en el índice y devuelve el resultado más cercano.  
-  - **English:** Performs a search in the index and returns the closest match.  
+  - **Español:** Busca el vector más cercano en el índice.  
+  - **English:** Searches for the closest vector in the index.
 
 - **Search_n:**  
-  - **Español:** Realiza una búsqueda y devuelve múltiples resultados cercanos.  
-  - **English:** Performs a search and returns multiple closest matches.  
+  - **Español:** Devuelve los N vectores más cercanos.  
+  - **English:** Returns the N closest vectors.
 
 - **Delete:**  
-  - **Español:** Elimina un vector del índice mediante su ID.  
-  - **English:** Deletes a vector from the index using its ID.  
+  - **Español:** Elimina un vector por su ID.  
+  - **English:** Deletes a vector by its ID.
 
 - **GetSize:**  
-  - **Español:** Obtiene el número total de vectores almacenados en el índice.  
-  - **English:** Retrieves the total number of vectors stored in the index.  
+  - **Español:** Obtiene el número total de vectores en el índice.  
+  - **English:** Gets the total number of vectors in the index.
 
 - **DumpIndex:**  
   - **Español:** Guarda el estado actual del índice en un archivo.  
-  - **English:** Saves the current state of the index to a file.  
+  - **English:** Saves the current index state to a file.
 
 - **LoadIndex:**  
-  - **Español:** Carga un índice desde un archivo previamente guardado.  
-  - **English:** Loads an index from a previously saved file.  
+  - **Español:** Carga un índice desde un archivo.  
+  - **English:** Loads an index from a file.
 
 - **Dispose:**  
-  - **Español:** Libera recursos y evita leaks de memoria.  
-  - **English:** Releases resources and prevents memory leaks.  
+  - **Español:** Libera recursos y evita fugas de memoria.  
+  - **English:** Releases resources and prevents memory leaks.
+
+- **GetStats:**  
+  - **Español:** Obtiene estadísticas detalladas del índice (operaciones, tiempos, etc).  
+  - **English:** Gets detailed index statistics (operations, timings, etc).
 
 ---
 
 ## Instalación / Installation
 
-# Español
-Para instalar la librería desde NuGet, utilizá el siguiente comando:
+### Español
+
+Para instalar la librería desde NuGet:
 
 ```bash
 dotnet add package VictorLib --prerelease
 ```
 
 ### English
-To install the library from NuGet, use the following command:
+
+To install the library from NuGet:
+
 ```bash
 dotnet add package VictorLib --prerelease
 ```
-### Ejemplos de uso/ Usage Examples
 
-# Español
+---
 
-```c
-VictorSDK sdk = new VictorSDK(type: 1, method: 2, dims: 128);
+## Ejemplo de uso / Usage Example
+
+### Español
+
+```csharp
+
+VictorSDK sdk = new(type: IndexType.FLAT, method: DistanceMethod.DOTPROD, dims: 128);
 
 // Insertar un vector
-sdk.Insert(1, new float[128], 128);
+sdk.Insert(id: 1,vector: new float[128],dims: 128);
 
 // Buscar un vector
 MatchResult result = sdk.Search(new float[128], 128);
-Console.WriteLine($"Match ID: {result.MatchId}, Distance: {result.MatchData}");
+Console.WriteLine($"Match ID: {result.Label}, Distance: {result.Distance}");
 
 // Obtener el tamaño del índice
 ulong size = sdk.GetSize();
@@ -101,16 +138,17 @@ sdk.DumpIndex("index_dump.dat");
 sdk.Dispose();
 ```
 
-# English
-```c
-VictorSDK sdk = new VictorSDK(type: 1, method: 2, dims: 128);
+### English
+
+```csharp
+VictorSDK sdk = new VictorSDK(type: IndexType.FLAT, method: DistanceMethod.DOTPROD, dims: 128);
 
 // Insert a vector
 sdk.Insert(1, new float[128], 128);
 
 // Search for a vector
 MatchResult result = sdk.Search(new float[128], 128);
-Console.WriteLine($"Match ID: {result.MatchId}, Distance: {result.MatchData}");
+Console.WriteLine($"Match ID: {result.Label}, Distance: {result.Distance}");
 
 // Get the size of the index
 ulong size = sdk.GetSize();
@@ -123,44 +161,189 @@ sdk.DumpIndex("index_dump.dat");
 sdk.Dispose();
 ```
 
-### Contribuciones / Contributions
-# Español
-Las contribuciones son bienvenidas, pero los Pull Requests (PR) deben ser aprobados por el autor del proyecto.
+---
 
-## Cómo contribuir:
+## Notas importantes / Important Notes
 
-- Creá tu rama con el siguiente formato:
+- **Contextos:**  
+  - Para índices tipo `HNSW` o `NSW`, debes pasar un contexto válido al constructor.  
+  - Para índices tipo `FLAT`, el contexto es ignorado y puede ser `null`.
 
-```bash
-git checkout -b feature/nombre-del-issue o nombre del feat
+- **Logging y Diagnóstico:**  
+  - El SDK utiliza `Debug.WriteLine` para mensajes de depuración.  
+  - No se imprimen mensajes en consola a menos que el usuario lo haga explícitamente.
+
+- **Compatibilidad:**  
+  - Compatible con Windows y Linux (x64).
+  - Requiere la biblioteca nativa Victor Base instalada y accesible en el sistema.
+
+---
+
+## Notas sobre tipos de índices y métodos de búsqueda / Notes on Index Types and Search Methods
+
+### Tipos de índice / Index Types
+
+- **FLAT:**  
+  - No requiere contexto, pero puedes pasar `null` para el parámetro `context` en el constructor.
+  - Uso recomendado para índices pequeños o cuando no necesitas estructuras jerárquicas.
+
+- **HNSW / NSW:**  
+  - Permiten y suelen requerir un contexto (`HNSWContext` o `NSWContext`) para configurar parámetros avanzados.
+  - Si pasas `null`, se usarán valores por defecto.
+  - Uso recomendado para grandes volúmenes de datos y búsquedas rápidas.
+
+**Nota:**  
+> Todos los tipos de índice aceptan `null` como contexto en el constructor.  
+> El contexto solo es obligatorio para `HNSW` y `NSW` si quieres personalizar parámetros.
+
+### Métricas de distancia / Distance Metrics
+
+- **cosine:**  
+  - Mide la similitud angular entre dos vectores.
+  - Útil para comparar orientación más que magnitud (por ejemplo, embeddings de texto).
+
+- **euclidian:**  
+  - Calcula la distancia euclidiana estándar.
+  - Útil para datos donde la magnitud importa.
+
+- **dotproduct:**  
+  - Calcula el producto punto entre dos vectores.
+  - Útil para tareas de ranking y algunas aplicaciones de machine learning.
+
+
+### Métodos de búsqueda / Search Methods
+
+- **Search:**  
+  - Devuelve el vector más cercano al vector de consulta.
+  - Uso general para obtener el mejor match.
+
+- **Search_n:**  
+  - Devuelve los N vectores más cercanos.
+  - Útil para recomendaciones, clustering, o análisis de vecinos.
+
+- **Contains:**  
+  - Verifica si uno o más IDs existen en el índice.
+
+- **Delete:**  
+  - Elimina un vector por su ID.
+
+### Ejemplo de inicialización con y sin contexto
+
+```csharp
+// FLAT index (contexto puede ser null)
+var flatSdk = new VictorSDK(type: IndexType.FLAT, method: DistanceMethod.DOTPROD, dims: 128, context: null);
+
+// HNSW index (con contexto personalizado)
+var hnswContext = HNSWContext.Create(efConstruct: 200, efSearch: 100, m0: 32);
+var hnswSdk = new VictorSDK(type: IndexType.HNSW, method: DistanceMethod.EUCLIDIAN, dims: 128, context: hnswContext);
+
+// HNSW index (con contexto por defecto)
+var hnswDefaultSdk = new VictorSDK(type: IndexType.HNSW, method: DistanceMethod.COSINE, dims: 128, context: null);
 ```
 
-# English
-Contributions are welcome, but Pull Requests (PR) must be approved by the author of this project before being accepted.
+---
 
-## How to contribute:
+## Notes on Index Types and Search Methods
 
-- Create a branch following this format:
+### Index Types
 
-```bash
-git checkout -b feature/nombre-del-issue or feat name
+- **FLAT:**  
+  - Does not require a context, but you can pass `null` for the `context` parameter in the constructor.
+  - Recommended for small indices or when you do not need hierarchical structures.
+
+- **HNSW / NSW:**  
+  - Allow and usually require a context (`HNSWContext` or `NSWContext`) to configure advanced parameters.
+  - If you pass `null`, default values will be used.
+  - Recommended for large datasets and fast searches.
+
+### Distance Metrics
+
+- **cosine:**  
+  - Measures the angular similarity between two vectors.
+  - Useful for comparing orientation rather than magnitude (e.g., text embeddings).
+
+- **euclidian:**  
+  - Computes the standard Euclidean distance.
+  - Useful when magnitude matters.
+
+- **dotproduct:**  
+  - Computes the dot product between two vectors.
+  - Useful for ranking tasks and some machine learning applications.
+
+
+**Note:**  
+> All index types accept `null` as the context in the constructor.  
+> The context is only required for `HNSW` and `NSW` if you want to customize parameters.
+
+### Search Methods
+
+- **Search:**  
+  - Returns the closest vector to the query vector.
+  - General use for obtaining the best match.
+
+- **Search_n:**  
+  - Returns the N closest vectors.
+  - Useful for recommendations, clustering, or neighbor analysis.
+
+- **Contains:**  
+  - Checks if one or more IDs exist in the index.
+
+- **Delete:**  
+  - Deletes a vector by its ID.
+
+### Example: Initialization With and Without Context
+
+```csharp
+// FLAT index (context can be null)
+var flatSdk = new VictorSDK(type: IndexType.FLAT, method: DistanceMethod.DOTPROD, dims: 128, context: null);
+
+// HNSW index (with custom context)
+var hnswContext = HNSWContext.Create(efConstruct: 200, efSearch: 100, m0: 32);
+var hnswSdk = new VictorSDK(type: IndexType.HNSW, method: DistanceMethod.COSINE, dims: 128, context: hnswContext);
+
+// HNSW index (with default context)
+var hnswDefaultSdk = new VictorSDK(type: IndexType.HNSW, method: DistanceMethod.COSINE, dims: 128, context: null);
 ```
 
-### 📜 Créditos y Licencia / Credits & License
-# Español
+---
 
-- Este SDK complementa Victor Base (https://github.com/victor-base), un proyecto desarrollado por Emiliano A. Billi.
-Este SDK también está licenciado bajo LGPL-3.0, y su autor es Iván E. Rodríguez.
-# English
+...
 
-- This SDK complements Victor Base (https://github.com/victor-base), a project developed by Emiliano A. Billi.
-This SDK is also licensed under LGPL-3.0, and its author is Iván E. Rodríguez.
+---
 
-### License
+## Contribuciones / Contributions
 
-- This project was developed by Iván Ezequiel Rodriguez under the LGPL-3.0 license.
-Its use is permitted in both open-source and commercial/private projects, as long as the terms of the license are respected.
+### Español
 
+Las contribuciones son bienvenidas. Por favor, abre un issue o un pull request siguiendo este formato:
 
-- For inquiries or direct technical support, contact: ivanrwcm25@gmail.com
-More information about the developer: https://ivanrodportolio.netlify.app/
+```bash
+git checkout -b feature/nombre-del-issue
+```
+
+### English
+
+Contributions are welcome. Please open an issue or pull request using this format:
+
+```bash
+git checkout -b feature/issue-name
+```
+
+---
+
+## Créditos y Licencia / Credits & License
+
+- **Español:**  
+  Este SDK complementa Victor Base (https://github.com/victor-base), un proyecto de Emiliano A. Billi.  
+  SDK desarrollado por Iván E. Rodríguez bajo licencia LGPL-3.0.
+
+- **English:**  
+  This SDK complements Victor Base (https://github.com/victor-base), a project by Emiliano A. Billi.  
+  SDK developed by Iván E. Rodríguez under LGPL-3.0 license.
+
+---
+
+## Soporte / Support
+
+- Para consultas técnicas: ivanrwcm25@gmail.com  
+- Más información sobre el desarrollador: https://ivanrodportolio.netlify.app/
