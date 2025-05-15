@@ -36,18 +36,6 @@ namespace Victor.Tests;
 
 public class VictorSDKTests
 {
-    private const string DatasetFileName = "dataset.fvecs";
-    private static void GenerateDummyFvecs(string filePath, int vectorCount = 10, int dimension = 128)
-    {
-        using var writer = new BinaryWriter(File.Open(filePath, FileMode.Create));
-
-        for (int i = 0; i < vectorCount; i++)
-        {
-            writer.Write(dimension); // primero la dimensión
-
-            for (int j = 0; j < dimension; j++) writer.Write((float)(i * 0.1f + j * 0.01f)); // valores dummy
-        }
-    }
 
 
     [Test]
