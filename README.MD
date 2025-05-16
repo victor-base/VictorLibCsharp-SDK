@@ -118,6 +118,7 @@ dotnet add package VictorLib --prerelease
 
 ```csharp
 
+// Pista: El ctor VictorSDK implementa IDisposable, por lo tanto podemos evitar el metodo Dispose() con using cada vez que inicialicemos el ctor.
 VictorSDK sdk = new(type: IndexType.FLAT, method: DistanceMethod.DOTPROD, dims: 128);
 
 // Insertar un vector
@@ -141,6 +142,7 @@ sdk.Dispose();
 ### English
 
 ```csharp
+//Hint: VictorSDK implements IDisposable, so you can avoid Dispose() with using to free resources.
 VictorSDK sdk = new VictorSDK(type: IndexType.FLAT, method: DistanceMethod.DOTPROD, dims: 128);
 
 // Insert a vector
