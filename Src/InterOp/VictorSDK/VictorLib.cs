@@ -41,6 +41,13 @@ public partial class VictorSDK : IDisposable
     private IntPtr _index;
     private bool _disposedFlag;
 
+    /// <summary>
+    /// ENG: Creates a new vector index. ESP: Crea un nuevo índice de vectores.
+    /// </summary>
+    /// <param name="type">ENG: Index type (FLAT, HNSW, NSW). ESP: Tipo de índice (FLAT, HNSW, NSW).</param>
+    /// <param name="method">ENG: Distance metric. ESP: Métrica de distancia.</param>
+    /// <param name="dims">ENG: Number of dimensions. ESP: Número de dimensiones.</param>
+    /// <param name="context">ENG: Optional context for advanced configuration. ESP: Contexto opcional para configuración avanzada.</param>
     public VictorSDK(IndexType type, DistanceMethod method, ushort dims, object? context = null)
     {
         _native = NativeMethodsFactory.Create();
@@ -60,7 +67,11 @@ public partial class VictorSDK : IDisposable
 
 public partial class VictorSDK
 {
-
+    /// <summary>
+    /// ENG: Updates the index context (parameters) at runtime. ESP: Actualiza el contexto (parámetros) del índice en tiempo de ejecución.
+    /// </summary>
+    /// <param name="context">ENG: HNSW context. ESP: Contexto HNSW.</param>
+    /// <param name="mode">ENG: Update mode. ESP: Modo de actualización.</param>
     public void UpdateContext(HNSWContext context, int mode)
     {
         IntPtr ptr = HNSWContext.ToPointer(context);
@@ -71,22 +82,32 @@ public partial class VictorSDK
 
 
 
-
-    internal string GetIndexName()
+    /// <summary>
+    /// ENG: Gets the name of the current index. ESP: Obtiene el nombre del índice actual.
+    /// </summary>
+    /// <returns>ENG: Index name. ESP: Nombre del índice.</returns>
+    public string GetIndexName()
     {
         IntPtr ptr = _native.index_name(_index);
         return Marshal.PtrToStringAnsi(ptr);
     }
 
-    internal string GetLibraryVersion()
+    /// <summary>
+    /// ENG: Gets the full version of the Victor library. ESP: Obtiene la versión completa de la biblioteca Victor.
+    /// </summary>
+    /// <returns>ENG: Library version. ESP: Versión de la biblioteca.</returns>
+    public string GetLibraryVersion()
     {
         IntPtr ptr = _native.__LIB_VERSION();
         return Marshal.PtrToStringAnsi(ptr);
     }
 
-    internal string GetShortVersion()
+
+    public string GetShortVersion()
     {
         IntPtr ptr = _native.__LIB_SHORT_VERSION();
+        if (ptr == IntPtr.Zero) throw new VictorException("\nInvalid Reference.\n", ErrorCode.INVALID_INIT);
+
         return Marshal.PtrToStringAnsi(ptr);
     }
 
@@ -114,31 +135,44 @@ public partial class VictorSDK
         // Si se proporciona un código adicional, inclúyelo en el mensaje de error.
         if (additionalCode.HasValue)
         {
-            throw new VictorException(code, $"Victor error {code} (Additional Code: {additionalCode}): {msg}");
+            throw new VictorException($"Victor error {code} (Additional Code: {additionalCode}): {msg}", code);
         }
         else
         {
-            throw new VictorException(code, $"Victor error {code}: {msg}");
+            throw new VictorException($"Victor error {code}: {msg}", code);
         }
     }
 
-
+    /// <summary>
+    /// ENG: Inserts a vector into the index. ESP: Inserta un vector en el índice.
+    /// </summary>
+    /// <param name="id">ENG: Unique vector ID. ESP: ID único del vector.</param>
+    /// <param name="vector">ENG: Vector data. ESP: Datos del vector.</param>
+    /// <param name="dims">ENG: Number of dimensions. ESP: Número de dimensiones.</param>
+    /// <returns>ENG: Status code. ESP: Código de estado.</returns>
     public int Insert(ulong id, float[] vector, ushort dims)
     {
         if (_index == IntPtr.Zero) throw new VictorException(ErrorCode.INVALID_INIT);
 
-        if (vector.Length != dims) throw new VictorException(ErrorCode.INVALID_INDEX, $"\nVector size ({vector.Length}) doesn't match with dimensions :({dims}).\n");
+        if (vector == null || vector.Length == 0) throw new VictorException("Vector is null or empty.", ErrorCode.INVALID_VECTOR);
+       
+        if (vector.Length != dims) throw new VictorException($"\nVector size ({vector.Length}) doesn't match with dimensions :({dims}).\n", ErrorCode.INVALID_DIMENSIONS);
 
         int status = _native.insert(_index, id, vector, dims);
 
-        if (status != 0) throw new VictorException($"\nErr with vector insert. status code: {status}\n");
+        if (status != 0) throw new VictorException($"Insert failed with code {status}", (ErrorCode)status);
 
         Debug.WriteLine($"\nVector with ID {id} inserted succesfully.\n");
         return status;
     }
 
 
-
+    /// <summary>
+    /// ENG: Searches for the closest vector in the index. ESP: Busca el vector más cercano en el índice.
+    /// </summary>
+    /// <param name="vector">ENG: Query vector. ESP: Vector de consulta.</param>
+    /// <param name="dims">ENG: Number of dimensions. ESP: Número de dimensiones.</param>
+    /// <returns>ENG: Match result. ESP: Resultado de la búsqueda.</returns>
     public MatchResult Search(float[] vector, ushort dims)
     {
         if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
@@ -162,6 +196,14 @@ public partial class VictorSDK
         }
     }
 
+
+    /// <summary>
+    /// ENG: Searches for the N closest vectors in the index. ESP: Busca los N vectores más cercanos en el índice.
+    /// </summary>
+    /// <param name="vector">ENG: Query vector. ESP: Vector de consulta.</param>
+    /// <param name="dims">ENG: Number of dimensions. ESP: Número de dimensiones.</param>
+    /// <param name="n">ENG: Number of results. ESP: Número de resultados.</param>
+    /// <returns>ENG: Array of match results. ESP: Arreglo de resultados de búsqueda.</returns>
     public MatchResult[] Search_n(float[] vector, ushort dims, int n)
     {
         if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
@@ -188,12 +230,9 @@ public partial class VictorSDK
 
 
     /// <summary>
-    /// Obtiene estadísticas agregadas del índice.
+    /// ENG: Gets aggregated statistics of the index. ESP: Obtiene estadísticas agregadas del índice.
     /// </summary>
-    /// <returns>Una instancia de <see cref="IndexStatsResult"/> con las estadísticas del índice.</returns>
-    /// <exception cref="InvalidOperationException">
-    /// Se lanza si el índice no ha sido creado o si ocurre un error al obtener las estadísticas.
-    /// </exception>
+    /// <returns>ENG: Index statistics. ESP: Estadísticas del índice.</returns>
     public IndexStatsResult GetStats()
     {
         if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
