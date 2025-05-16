@@ -23,7 +23,6 @@
 
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using NUnit.Framework;
@@ -31,11 +30,18 @@ using Victor.NativeMethods.Factory;
 using VictorBaseDotNET.Src.Common;
 using VictorBaseDotNET.Src.utils;
 using VictorExceptions;
+using VictorBenchmarks;
 
 namespace Victor.Tests;
 
+[TestFixture]
 public class VictorSDKTests
 {
+    internal static float[] RandomVector()
+    {
+        Random rand = new();
+        return Enumerable.Range(0, 128).Select(_ => (float)rand.NextDouble()).ToArray();
+    }
 
 
     [Test]
@@ -58,15 +64,16 @@ public class VictorSDKTests
         Assert.AreEqual(ErrorCode.SUCCESS, status); // SUCCESS = 0
     }
 
+
     [Test]
     public void Search_ShouldReturnValidResult()
     {
         VictorSDK sdk = new(type: IndexType.FLAT, method: DistanceMethod.EUCLIDIAN, dims: 128);
         float[] vector = new float[128];
 
-        // Llenar el vector con algo (puede ser random o secuencial)
-        for (int i = 0; i < vector.Length; i++)
-            vector[i] = i / 128f;
+        for (int i = 0; i < vector.Length; i++) vector[i] = 0.72f;
+
+        for (int i = 0; i < vector.Length; i++) vector[i] = i / 128f;
 
         sdk.Insert(1, vector, 128); // ← Necesario
 
@@ -81,7 +88,7 @@ public class VictorSDKTests
     [Test]
     public void GetSize_ShouldReturnCorrectSize()
     {
-        VictorSDK sdk = new (type: IndexType.HNSW, method: DistanceMethod.COSINE, dims: 128);
+        VictorSDK sdk = new(type: IndexType.HNSW, method: DistanceMethod.COSINE, dims: 128);
         sdk.Insert(1, new float[128], 128);
 
         ulong size = sdk.GetSize();
@@ -118,6 +125,69 @@ public class VictorSDKTests
         Assert.DoesNotThrow(() => sdk.DumpIndex(filename));
     }
 
+
+    [Test]
+    public void Insert_ValidVector_ShouldSucceed()
+    {
+        using var sdk = new VictorSDK(IndexType.HNSW, DistanceMethod.COSINE, 128, HNSWContext.Create());
+
+        float[] vector = Enumerable.Repeat(1.0f, 128).ToArray();
+        int status = sdk.Insert(1, vector, 128);
+
+        Assert.AreEqual(0, status); // SUCCESS
+    }
+
+    [Test]
+    public void Insert_EmptyVector_ShouldThrowVictorException()
+    {
+        using var sdk = new VictorSDK(IndexType.HNSW, DistanceMethod.COSINE, 128, HNSWContext.Create());
+
+        float[] emptyVector = [];
+
+        var ex = Assert.Throws<VictorException>(() =>
+        {
+            sdk.Insert(2, emptyVector, 128);
+        });
+
+        Assert.AreEqual(ErrorCode.INVALID_VECTOR, ex.Code);
+    }
+
+[Test]
+public void Benchmark_Insert_5000_HNSW()
+{
+    using var sdk = new VictorSDK(IndexType.HNSW, DistanceMethod.COSINE, 128, HNSWContext.Create());
+    VictorRenderTest bench = new(sdk);
+
+    bench.InsertMany(5000, 128);
+    var result = bench.GetStats();
+
+    Debug.WriteLine(result);
+}
+[Test]
+public void Benchmark_Insert_5000_NSW()
+{
+    using var sdk = new VictorSDK(IndexType.NSW, DistanceMethod.COSINE, 128, HNSWContext.Create());
+    VictorRenderTest bench = new(sdk);
+
+    bench.InsertMany(5000, 128);
+    var result = bench.GetStats();
+
+    Debug.WriteLine(result);
+}
+[Test]
+public void Benchmark_Insert_5000_FLAT()
+{
+    using var sdk = new VictorSDK(IndexType.FLAT, DistanceMethod.COSINE, 128);
+    VictorRenderTest bench = new(sdk);
+
+    bench.InsertMany(5000, 128);
+    var result = bench.GetStats();
+
+    Debug.WriteLine(result);
+}
+
+
+
     // Debería devolver true si el id del vector existe en el índice.
     [Test]
     public void Contains_ShouldReturnTrueForExistingId()
@@ -125,15 +195,39 @@ public class VictorSDKTests
         VictorSDK sdk = new(type: IndexType.HNSW, method: DistanceMethod.COSINE, dims: 128, context: HNSWContext.Create());
 
 
-        sdk.Insert(id: 1, vector: new float[128], dims: 128);
-        sdk.Insert(id: 2, vector: new float[128], dims: 128);
-        sdk.Insert(id: 3, vector: new float[128], dims: 128);
-        sdk.Insert(id: 4, vector: new float[128], dims: 128);
-        sdk.Insert(id: 5, vector: new float[128], dims: 128);
+        sdk.Insert(id: 1, vector: [.. Enumerable.Repeat(0.22f, 128)], dims: 128);
+        sdk.Insert(id: 2, vector: [.. Enumerable.Repeat(0.22f, 128)], dims: 128);
+        sdk.Insert(id: 3, vector: [.. Enumerable.Repeat(0.22f, 128)], dims: 128);
+        sdk.Insert(id: 4, vector: [.. Enumerable.Repeat(0.22f, 128)], dims: 128);
+        sdk.Insert(id: 5, vector: [.. Enumerable.Repeat(0.22f, 128)], dims: 128);
 
         bool exists = sdk.Contains(1, 2, 3, 4, 5);
 
         Assert.IsTrue(exists);
+    }
+    // Debería devolver true si el id del vector existe en el índice.
+    [Test]
+    public void Contains_and_search_n_ShouldReturnTrueForExistingIdNearestsAndStats()
+    {
+        using VictorSDK sdk = new(type: IndexType.HNSW, method: DistanceMethod.COSINE, dims: 128, context: HNSWContext.Create());
+
+
+
+        for (int i = 1; i <= 100; i++) sdk.Insert(id: (ulong)i, vector: RandomVector(), dims: 128);
+
+
+        MatchResult[] result = sdk.Search_n(new float[128], 128, 5);
+
+        Assert.IsTrue(result.Length > 0);
+
+        sdk.Search_n(vector: new float[128], dims: 128, n: 1);
+        sdk.Search_n(vector: new float[128], dims: 128, n: 4);
+        sdk.Search_n(vector: new float[128], dims: 128, n: 96);
+
+        Console.WriteLine("Resultados de búsqueda:");
+        foreach (var match in result) Debug.WriteLine($"ID: {match.Label}, Distancia: {match.Distance}");
+
+        Assert.IsTrue(result.Length > 0);
     }
 
     // Test negativo para el método Insert
@@ -146,8 +240,8 @@ public class VictorSDKTests
             var context = HNSWContext.Create();
             VictorSDK sdk = new(type: IndexType.NSW, method: DistanceMethod.EUCLIDIAN, dims: 128, context);
             Debug.WriteLine($"SDK created: {sdk}");
-            float[] badVector = new float[128];
-            sdk.Insert(1, badVector, 128);
+            float[] TestVector = new float[128];
+            sdk.Insert(1, TestVector, 128);
         });
     }
 
@@ -232,7 +326,7 @@ public class VictorSDKTests
 
         Assert.Throws<ArgumentException>(() =>
         {
-            HNSWContext.Create(0, 0, 0);
+            HNSWContext.Create(-10, 0, 0);
         });
     }
 
