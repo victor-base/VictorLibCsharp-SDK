@@ -37,9 +37,21 @@ namespace Victor;
 
 public partial class VictorSDK : IDisposable
 {
+    private readonly IndexType _type;
+    private readonly DistanceMethod _method;
+    private readonly ushort _dims;
     private readonly INativeMethods _native;
     private IntPtr _index;
     private bool _disposedFlag;
+
+
+    // Constructor privado para inicializar desde un índice cargado
+    private VictorSDK(IntPtr index)
+    {
+        _native = NativeMethodsFactory.Create();
+        _index = index;
+        Debug.WriteLine("\nIndex loaded successfully.\n");
+    }
 
     /// <summary>
     /// ENG: Creates a new vector index. ESP: Crea un nuevo índice de vectores.
@@ -155,7 +167,7 @@ public partial class VictorSDK
         if (_index == IntPtr.Zero) throw new VictorException(ErrorCode.INVALID_INIT);
 
         if (vector == null || vector.Length == 0) throw new VictorException("Vector is null or empty.", ErrorCode.INVALID_VECTOR);
-       
+
         if (vector.Length != dims) throw new VictorException($"\nVector size ({vector.Length}) doesn't match with dimensions :({dims}).\n", ErrorCode.INVALID_DIMENSIONS);
 
         int status = _native.insert(_index, id, vector, dims);

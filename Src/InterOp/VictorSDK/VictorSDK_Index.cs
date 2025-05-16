@@ -18,23 +18,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using VictorBaseDotNET.Src.utils;
 using VictorExceptions;
+using VictorSnapshots;
 
 namespace Victor;
 
 public partial class VictorSDK
 {
-
-	// Constructor privado para inicializar desde un índice cargado
-	private VictorSDK(IntPtr index)
-	{
-		_index = index;
-		Debug.WriteLine("\nIndex loaded successfully.\n");
-	}
-
-
-
 
 	/// <summary>
 	/// Updates the index context with the provided pointer.
@@ -49,7 +45,7 @@ public partial class VictorSDK
 		if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
 
 		int status = _native.update_icontext(_index, icontext);
-		
+
 		if (status != 0) throw new InvalidOperationException("\nError updating index context.\n");
 
 		Debug.WriteLine("\nIndex context updated successfully.\n");
@@ -71,11 +67,10 @@ public partial class VictorSDK
 		if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
 
 		int status = _native.dump(_index, filename);
-		if (status != 0) throw new InvalidOperationException($"\nError dumping index to file: {filename}\n");
+		if (status != 0) throw new VictorException($"\nError dumping index to file: {filename}\n", ErrorCode.INVALID_FILE);
 
 		Debug.WriteLine($"\nIndex dumped successfully to file: {filename}.\n");
 	}
-
 
 
 
@@ -115,11 +110,11 @@ public partial class VictorSDK
 	/// </remarks>
 	public ulong GetSize()
 	{
-		if (_index == IntPtr.Zero) 	throw new InvalidOperationException("\nIndex not created.\n");
+		if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
 
 		int status = _native.size(_index, out ulong size);
 		if (status != 0) throw new InvalidOperationException("\nError retrieving index size.\n");
-		
+
 		Debug.Write($"Tamaño del Índice: {size}");
 		return size;
 	}
@@ -138,11 +133,11 @@ public partial class VictorSDK
 	public VictorSDK LoadIndex(string filename)
 	{
 		IntPtr index = _native.load_index(filename);
-		
+
 		if (index == IntPtr.Zero) throw new InvalidOperationException($"\nError loading index from file: {filename}\n");
-		
+
 		Debug.WriteLine($"\nÍndice cargado correctamente desde el archivo {filename}.\n");
-		
+
 		return new VictorSDK(index);
 	}
 
@@ -160,15 +155,53 @@ public partial class VictorSDK
 	/// </remarks>
 	public int Delete(ulong id)
 	{
-		if (_index == IntPtr.Zero)	throw new VictorException("\nIndex not created.\n");
+		if (_index == IntPtr.Zero) throw new VictorException("\nIndex not created.\n");
 
 		int status = _native.delete(_index, id);
 
 		if (status != 0) throw new VictorException($"\nERR: Can't eliminate vector with ID: {id}. status code: {status}\n");
 
 		Debug.WriteLine($"\nVector with ID: {id} eliminated succesfully.\n");
-		
+
 		return status;
 	}
 
+
+}
+
+internal static class VictorPersistence
+{
+    public static void DumpToFile(VictorSDK sdk, string path, ushort dims, IndexType type, DistanceMethod method, IEnumerable<VectorEntry> vectors)
+    {
+        var snapshot = new VictorIndexSnapshot
+        {
+            Dimensions = dims,
+            IndexType = type,
+            Method = method,
+            Vectors = vectors.ToList()
+        };
+
+        string json = JsonSerializer.Serialize(snapshot, new JsonSerializerOptions { WriteIndented = true });
+        File.WriteAllText(path, json);
+    }
+
+    public static VictorSDK LoadFromFile(string path)
+    {
+        string json = File.ReadAllText(path);
+        var snapshot = JsonSerializer.Deserialize<VictorIndexSnapshot>(json)  ?? throw new InvalidOperationException("No se pudo deserializar el índice.");
+#nullable enable
+        object? context = snapshot.IndexType switch
+        {
+            IndexType.HNSW => HNSWContext.Create(),
+            IndexType.NSW => NSWContext.Create(),
+            _ => null
+        };
+
+        var sdk = new VictorSDK(snapshot.IndexType, snapshot.Method, snapshot.Dimensions, context);
+
+        foreach (var entry in snapshot.Vectors)
+            sdk.Insert(entry.Id, entry.Vector, snapshot.Dimensions);
+
+        return sdk;
+    }
 }

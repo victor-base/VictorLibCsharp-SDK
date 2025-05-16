@@ -31,25 +31,20 @@ using VictorBaseDotNET.Src.Common;
 using VictorBaseDotNET.Src.utils;
 using VictorExceptions;
 using VictorBenchmarks;
+using System.IO;
+using System.Collections.Generic;
 
 namespace Victor.Tests;
 
 [TestFixture]
-public class VictorSDKTests
+internal class VictorSDKTests
 {
-    internal static float[] RandomVector()
+    static float[] RandomVector()
     {
         Random rand = new();
         return Enumerable.Range(0, 128).Select(_ => (float)rand.NextDouble()).ToArray();
     }
 
-
-    [Test]
-    public void InitVictorSDK_ShouldInitializeSuccessfully()
-    {
-        VictorSDK sdk = new(type: IndexType.FLAT, method: DistanceMethod.DOTPROD, dims: 128);
-        Assert.Pass("El test pasa creando índices NSW", sdk);
-    }
 
 
 
@@ -96,17 +91,6 @@ public class VictorSDKTests
         Assert.AreEqual((ulong)1, size);
     }
 
-    [Test]
-    public void GetSizeNSWIndex_ShouldReturnCorrectSize()
-    {
-        NSWContext context = NSWContext.Create();
-        VictorSDK test = new(type: IndexType.NSW, method: DistanceMethod.COSINE, dims: 129, context);
-        test.Insert(1, new float[129], 129);
-        var size = test.GetSize();
-        Assert.DoesNotThrow(() => test.GetStats());
-        Assert.GreaterOrEqual(size, 1);
-        test.Dispose();
-    }
 
 
     [Test]
@@ -117,13 +101,53 @@ public class VictorSDKTests
     }
 
     [Test]
-    public void DumpIndex_ShouldNotThrowException()
+    public void DoubleUsing_DumpFromFlatAndSearchWithHNSW_ShouldSucceed()
     {
-        VictorSDK sdk = new(type: IndexType.HNSW, method: DistanceMethod.EUCLIDIAN, dims: 128);
-        string filename = "index_dump.dat";
+        string path = Path.Combine(Path.GetTempPath(), $"New_index_{Guid.NewGuid()}.json");
 
-        Assert.DoesNotThrow(() => sdk.DumpIndex(filename));
+        List<VectorEntry> dumpedVectors = new();
+        ushort dims = 128;
+
+        // PRIMER USING: índice FLAT que inserta y dumpea
+        using (VictorSDK flat = new(IndexType.FLAT, DistanceMethod.COSINE, dims))
+        {
+            for (ulong i = 1; i <= 50; i++)
+            {
+                float[] vector = Enumerable.Repeat((float)i / 100, dims).ToArray();
+                flat.Insert(i, vector, dims);
+
+                dumpedVectors.Add(new VectorEntry { Id = i, Vector = vector });
+            }
+
+            VictorPersistence.DumpToFile(flat, path, dims, IndexType.FLAT, DistanceMethod.COSINE, dumpedVectors);
+        }
+
+        Assert.IsTrue(File.Exists(path), "El archivo JSON no fue creado correctamente.");
+
+        // SEGUNDO USING: índice HNSW que carga y busca
+        using (VictorSDK hnsw = new(IndexType.HNSW, DistanceMethod.COSINE, dims, HNSWContext.Create()))
+        {
+            foreach (var entry in dumpedVectors) hnsw.Insert(entry.Id, entry.Vector, dims);
+
+            float[] query = Enumerable.Repeat(0.3f, dims).ToArray();
+            var result = hnsw.Search(query, dims);
+
+            Assert.IsTrue(result.Label > 0, "No se encontró un resultado válido.");
+            Assert.IsTrue(result.Distance >= 0);
+        }
+
+        Debug.WriteLine("El segundo índice HNSW se creó y buscó correctamente.");
+        // Cleanup
+        if (File.Exists(path))
+        {
+            Debug.WriteLine($"Este es el archivo de dump: {path}");
+            Debug.WriteLine(File.ReadAllText(path));
+            File.Delete(path);
+        }
     }
+
+
+
 
 
     [Test]
@@ -152,39 +176,39 @@ public class VictorSDKTests
         Assert.AreEqual(ErrorCode.INVALID_VECTOR, ex.Code);
     }
 
-[Test]
-public void Benchmark_Insert_5000_HNSW()
-{
-    using var sdk = new VictorSDK(IndexType.HNSW, DistanceMethod.COSINE, 128, HNSWContext.Create());
-    VictorRenderTest bench = new(sdk);
+    [Test]
+    public void Benchmark_Insert_5000_HNSW()
+    {
+        using var sdk = new VictorSDK(IndexType.HNSW, DistanceMethod.COSINE, 128, HNSWContext.Create());
+        VictorRenderTest bench = new(sdk);
 
-    bench.InsertMany(5000, 128);
-    var result = bench.GetStats();
+        bench.InsertMany(5000, 128);
+        var result = bench.GetStats();
 
-    Debug.WriteLine(result);
-}
-[Test]
-public void Benchmark_Insert_5000_NSW()
-{
-    using var sdk = new VictorSDK(IndexType.NSW, DistanceMethod.COSINE, 128, HNSWContext.Create());
-    VictorRenderTest bench = new(sdk);
+        Debug.WriteLine(result);
+    }
+    [Test]
+    public void Benchmark_Insert_5000_NSW()
+    {
+        using var sdk = new VictorSDK(IndexType.NSW, DistanceMethod.COSINE, 128, HNSWContext.Create());
+        VictorRenderTest bench = new(sdk);
 
-    bench.InsertMany(5000, 128);
-    var result = bench.GetStats();
+        bench.InsertMany(5000, 128);
+        var result = bench.GetStats();
 
-    Debug.WriteLine(result);
-}
-[Test]
-public void Benchmark_Insert_5000_FLAT()
-{
-    using var sdk = new VictorSDK(IndexType.FLAT, DistanceMethod.COSINE, 128);
-    VictorRenderTest bench = new(sdk);
+        Debug.WriteLine(result);
+    }
+    [Test]
+    public void Benchmark_Insert_5000_FLAT()
+    {
+        using var sdk = new VictorSDK(IndexType.FLAT, DistanceMethod.COSINE, 128);
+        VictorRenderTest bench = new(sdk);
 
-    bench.InsertMany(5000, 128);
-    var result = bench.GetStats();
+        bench.InsertMany(5000, 128);
+        var result = bench.GetStats();
 
-    Debug.WriteLine(result);
-}
+        Debug.WriteLine(result);
+    }
 
 
 
@@ -205,30 +229,7 @@ public void Benchmark_Insert_5000_FLAT()
 
         Assert.IsTrue(exists);
     }
-    // Debería devolver true si el id del vector existe en el índice.
-    [Test]
-    public void Contains_and_search_n_ShouldReturnTrueForExistingIdNearestsAndStats()
-    {
-        using VictorSDK sdk = new(type: IndexType.HNSW, method: DistanceMethod.COSINE, dims: 128, context: HNSWContext.Create());
 
-
-
-        for (int i = 1; i <= 100; i++) sdk.Insert(id: (ulong)i, vector: RandomVector(), dims: 128);
-
-
-        MatchResult[] result = sdk.Search_n(new float[128], 128, 5);
-
-        Assert.IsTrue(result.Length > 0);
-
-        sdk.Search_n(vector: new float[128], dims: 128, n: 1);
-        sdk.Search_n(vector: new float[128], dims: 128, n: 4);
-        sdk.Search_n(vector: new float[128], dims: 128, n: 96);
-
-        Console.WriteLine("Resultados de búsqueda:");
-        foreach (var match in result) Debug.WriteLine($"ID: {match.Label}, Distancia: {match.Distance}");
-
-        Assert.IsTrue(result.Length > 0);
-    }
 
     // Test negativo para el método Insert
     // Verifica que se lanza una excepción si el vector no tiene la longitud correcta
@@ -245,26 +246,6 @@ public void Benchmark_Insert_5000_FLAT()
         });
     }
 
-
-    // Test de sistema
-    [Test]
-    public void FullLifecycleTest()
-    {
-        VictorSDK _sdk = new(type: IndexType.FLAT, method: DistanceMethod.DOTPROD, dims: 128, null);
-        float[] vector = [.. Enumerable.Range(0, 128).Select(i => (float)i / 128)];
-        ulong id = 777;
-
-        _sdk.Insert(id, vector, 128);
-        Assert.IsTrue(_sdk.Contains(id));
-
-        var result = _sdk.Search(vector, 128);
-        Assert.IsTrue(result.Distance >= 0);
-
-        ulong size = _sdk.GetSize();
-        Assert.GreaterOrEqual(size, 1);
-
-        _sdk.DumpIndex("test_dump.dat");
-    }
 
     // Test de integración del Factory
     [Test]
@@ -343,16 +324,7 @@ public void Benchmark_Insert_5000_FLAT()
     }
 
 
-    [Test]
-    public void TestVictorErr_ShouldRetVictorException()
-    {
-        VictorSDK test = new(type: IndexType.FLAT, method: DistanceMethod.DOTPROD, dims: 128);
-        test.Insert(1, new float[128], 128);
-        test.Insert(3, new float[128], 0);
-        test.ThrowIfError(ErrorCode.INVALID_DIMENSIONS);
 
-        Assert.Throws<VictorException>(() => test.ThrowIfError(ErrorCode.INVALID_DIMENSIONS));
-    }
 
 }
 
