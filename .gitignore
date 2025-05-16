@@ -28,3 +28,4 @@ project.assets.json
 secrets.json
 .env
 appsettings.json
+.TestResults/
