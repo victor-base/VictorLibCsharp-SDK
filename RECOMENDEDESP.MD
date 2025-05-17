@@ -90,13 +90,13 @@ string customPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFo
 VictorPersistence.DumpToFile(flat, customPath, dims, IndexType.FLAT, DistanceMethod.COSINE, flat.GetInsertedVectors());
 ```
 
-- O configurar una ruta base:
+- O configurar una ruta base (Recomendado):
 
 ```csharp
-VictorPersistence.SetBasePath("C:\\MiProyecto\\VectorDumps");
+var CustomPath = VictorPersistence.SetBasePath("C:\\MiProyecto\\VectorDumps");
 ```
 
-- Después podés seguir usando DumpToAutoPath(...) y los archivos se guardarán ahí.
+- Después podés seguir usando DumpToAutoPath(CustomPath ...) y los archivos se guardarán ahí.
 
 ## ¿Querés ver todos los vectores guardados?
 
