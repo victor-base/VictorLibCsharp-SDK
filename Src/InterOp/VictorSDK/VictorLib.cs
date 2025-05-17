@@ -38,9 +38,6 @@ namespace Victor;
 
 public partial class VictorSDK : IDisposable
 {
-    private readonly IndexType _type;
-    private readonly DistanceMethod _method;
-    private readonly ushort _dims;
     private readonly INativeMethods _native;
     private IntPtr _index;
     private readonly List<VectorEntry> _insertedVectors = new();
