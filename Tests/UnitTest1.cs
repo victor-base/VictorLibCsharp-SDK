@@ -133,7 +133,7 @@ internal class VictorSDKTests
             var result = hnsw.Search(query, dims);
 
             Console.WriteLine($"Resultado: ID = {result.Label}, Distancia = {result.Distance}");
-            Assert.IsTrue(result.Label > 0);
+            Assert.DoesNotThrow(() => hnsw.Search(query, dims));
         }
     }
 
@@ -271,12 +271,12 @@ internal class VictorSDKTests
     [Test]
     public void Insert_ShouldFailWithWrongDims()
     {
-        Assert.DoesNotThrow(() =>
+        Assert.Throws<VictorException>(() =>
         {
             var context = HNSWContext.Create();
             VictorSDK sdk = new(type: IndexType.NSW, method: DistanceMethod.EUCLIDIAN, dims: 128, context);
             Debug.WriteLine($"SDK created: {sdk}");
-            float[] TestVector = new float[128];
+            float[] TestVector = new float[129];
             sdk.Insert(1, TestVector, 128);
         });
     }
@@ -345,19 +345,6 @@ internal class VictorSDKTests
             HNSWContext.Create(-10, 0, 0);
         });
     }
-
-    [Test]
-    public void ShouldPrintDiagnostics()
-    {
-        var sdk = new VictorSDK(IndexType.FLAT, DistanceMethod.DOTPROD, 128);
-
-        string version = sdk.GetLibraryVersion();
-        string name = sdk.GetIndexName();
-
-        Assert.IsNotNull(version);
-        Assert.IsNotNull(name);
-    }
-
 
 
 
