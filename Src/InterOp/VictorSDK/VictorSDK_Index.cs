@@ -29,7 +29,7 @@ using VictorSnapshots;
 
 namespace Victor;
 
-public partial class VictorSDK
+public partial class VictorSDK : IDisposable
 {
 
 	/// <summary>
@@ -130,22 +130,22 @@ public partial class VictorSDK
 	/// <remarks>
 	/// ESP: Carga un índice desde un archivo.
 	/// </remarks>
-	public VictorSDK LoadIndex(string filename)
-	{
-		IntPtr index = _native.load_index(filename);
+	// public VictorSDK LoadIndex(string filename)
+	// {
+	// 	IntPtr index = _native.load_index(filename);
 
-		if (index == IntPtr.Zero) throw new InvalidOperationException($"\nError loading index from file: {filename}\n");
+	// 	if (index == IntPtr.Zero) throw new InvalidOperationException($"\nError loading index from file: {filename}\n");
 
-		Debug.WriteLine($"\nÍndice cargado correctamente desde el archivo {filename}.\n");
+	// 	Debug.WriteLine($"\nÍndice cargado correctamente desde el archivo {filename}.\n");
 
-		return new VictorSDK(index);
-	}
+	// 	return new VictorSDK(index);
+	// }
 
 
 
 
 	/// <summary>
-	/// ENG: Deletes a vector with the specified ID from the index.
+	/// ENG: Deletes a vector with the specified ID from the index. ESP: Elimina un vector con el ID especificado del índice.
 	/// </summary>
 	/// <param name="id">The ID of the vector to delete.</param>
 	/// <returns>The status code of the delete operation.</returns>
@@ -165,43 +165,130 @@ public partial class VictorSDK
 
 		return status;
 	}
-
-
 }
 
-internal static class VictorPersistence
-{
-    public static void DumpToFile(VictorSDK sdk, string path, ushort dims, IndexType type, DistanceMethod method, IEnumerable<VectorEntry> vectors)
-    {
-        var snapshot = new VictorIndexSnapshot
-        {
-            Dimensions = dims,
-            IndexType = type,
-            Method = method,
-            Vectors = vectors.ToList()
-        };
-
-        string json = JsonSerializer.Serialize(snapshot, new JsonSerializerOptions { WriteIndented = true });
-        File.WriteAllText(path, json);
-    }
-
-    public static VictorSDK LoadFromFile(string path)
-    {
-        string json = File.ReadAllText(path);
-        var snapshot = JsonSerializer.Deserialize<VictorIndexSnapshot>(json)  ?? throw new InvalidOperationException("No se pudo deserializar el índice.");
 #nullable enable
-        object? context = snapshot.IndexType switch
-        {
-            IndexType.HNSW => HNSWContext.Create(),
-            IndexType.NSW => NSWContext.Create(),
-            _ => null
-        };
 
-        var sdk = new VictorSDK(snapshot.IndexType, snapshot.Method, snapshot.Dimensions, context);
+public static class VictorPersistence
+{
 
-        foreach (var entry in snapshot.Vectors)
-            sdk.Insert(entry.Id, entry.Vector, snapshot.Dimensions);
+	private static string? _customBasePath;
 
-        return sdk;
-    }
+
+	/// <summary>
+	/// Permite configurar una ruta base para guardar archivos.
+	/// </summary>
+	public static void SetBasePath(string path) => _customBasePath = path;
+
+
+	// overload del metodo para simplificar laburo al dev
+	public static string DumpToAutoPath(VictorSDK sdk, ushort dims, IndexType type, DistanceMethod method) => DumpToAutoPath(sdk, dims, type, method, sdk.GetInsertedVectors());
+
+	/// <summary>
+	/// ENG: Dumps generated index with a auto file path. ESP: Dump del índice a archivo con ruta generada automáticamente.
+	/// </summary>
+	/// <param name="sdk">Instancia de <see cref="VictorSDK"/>.</param>
+	/// <param name="dims">Dimensiones del índice.</param>
+	/// <param name="type">Tipo de índice.</param>
+	/// <param name="method">Método de distancia.</param>
+	/// <param name="vectors">Vectores a serializar.</param>
+	/// <returns>Ruta del archivo generado.</returns>
+	/// <exception cref="VictorException">Lanza una excepción si no se puede serializar el índice.</exception>
+	public static string DumpToAutoPath(VictorSDK sdk, ushort dims, IndexType type, DistanceMethod method, IEnumerable<VectorEntry> vectors)
+	{
+		string folder = _customBasePath ?? Path.Combine(Directory.GetCurrentDirectory(), ".victorIndex");
+
+		if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
+
+		string fileName = $"victor_index_{DateTime.Now:yyyyMMdd_HHmmss}_{Guid.NewGuid()}.json";
+		string fullPath = Path.Combine(folder, fileName);
+
+		DumpToFile(sdk, fullPath, dims, type, method, vectors);
+		EnsureGitIgnore(folder);
+
+		Console.WriteLine($"\nIndex dumped successfully to file: {fullPath}.\n");
+		Debug.WriteLine($"\nIndex dumped successfully to file: {fullPath}.\n");
+
+		return fullPath;
+	}
+
+	private static void EnsureGitIgnore(string folder)
+	{
+		string gitignore = Path.Combine(folder, ".gitignore");
+
+		if (!File.Exists(gitignore)) File.WriteAllText(gitignore, "*\n!.gitignore\n");
+
+		else
+		{
+			var lines = File.ReadAllLines(gitignore).ToList();
+			bool modified = false;
+
+			if (!lines.Contains("*")) { lines.Add("*"); modified = true; }
+			if (!lines.Contains("!.gitignore")) { lines.Add("!.gitignore"); modified = true; }
+
+			if (modified) File.WriteAllLines(gitignore, lines);
+		}
+
+		File.WriteAllText(gitignore, "*\n!.gitignore\n");
+	}
+
+
+
+	/// <summary> ENG: Dumps the current index to a JSON file at the specified path. ESP: Persiste el índice seleccionado en un archivo Json. </summary>
+	/// <param name="sdk">The instance of <see cref="VictorSDK"/> associated with the operation.</param>
+	/// <param name="path">The file path where the JSON output will be written.</param>
+	/// <param name="dims">The number of dimensions for the vectors.</param>
+	/// <param name="type">The type of index to be used.</param>
+	/// <param name="method">The distance method to be applied.</param>
+	/// <param name="vectors">A collection of <see cref="VectorEntry"/> objects to be serialized.</param>
+	///<returns>A <see cref="VictorSDK"/>This function does not have any return.</returns>
+	public static void DumpToFile(VictorSDK sdk, string path, ushort dims, IndexType type, DistanceMethod method, IEnumerable<VectorEntry> vectors)
+	{
+		VictorIndexSnapshot snapshot = new()
+		{
+			Dimensions = dims,
+			IndexType = type,
+			Method = method,
+			Vectors = vectors.ToList()
+		};
+
+		string json = JsonSerializer.Serialize(snapshot, new JsonSerializerOptions { WriteIndented = true });
+		File.WriteAllText(path, json);
+		Console.WriteLine($"\nIndex dumped successfully to file: {path}.\n");
+		Debug.WriteLine($"\nIndex dumped successfully to file: {path}.\n");
+	}
+
+	/// <summary>
+	/// Loads a <see cref="VictorSDK"/> ENG: instance from a JSON file at the specified path.  ESP: Carga una instancia de <see cref="VictorSDK"/> desde un archivo JSON en la ruta especificada.
+	/// </summary>
+	/// <param name="path">The file path to the JSON file containing the index snapshot.</param>
+	/// <returns>A <see cref="VictorSDK"/> instance initialized with the data from the file.</returns>
+	///<exception cref="InvalidOperationException">Thrown if the index is not created or if there is an error deleting the vector.</exception>
+	public static VictorSDK LoadFromFile(string path)
+	{
+		string json = File.ReadAllText(path);
+		var snapshot = JsonSerializer.Deserialize<VictorIndexSnapshot>(json) ?? throw new VictorException("No se pudo deserializar el índice.", ErrorCode.FILEIO_ERROR);
+
+
+
+		object? context = snapshot.IndexType switch
+		{
+			IndexType.HNSW => HNSWContext.Create(),
+			IndexType.NSW => NSWContext.Create(),
+			_ => null
+		};
+
+		VictorSDK sdk = new(snapshot.IndexType, snapshot.Method, snapshot.Dimensions, context);
+
+		foreach (VectorEntry? entry in snapshot.Vectors) sdk.Insert(entry.Id, entry.Vector, snapshot.Dimensions);
+
+		return sdk;
+	}
+	public static VictorIndexSnapshot ReadSnapshot(string path)
+	{
+		string json = File.ReadAllText(path);
+		return JsonSerializer.Deserialize<VictorIndexSnapshot>(json) ?? throw new VictorException("No se pudo leer el snapshot", ErrorCode.FILEIO_ERROR);
+	}
+
+
 }

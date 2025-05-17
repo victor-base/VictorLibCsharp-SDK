@@ -31,6 +31,7 @@ using NativeMethodsInterface;
 using Victor.NativeMethods.Factory;
 using System.Diagnostics;
 using VictorExceptions;
+using System.Collections.Generic;
 #nullable enable
 
 namespace Victor;
@@ -42,6 +43,7 @@ public partial class VictorSDK : IDisposable
     private readonly ushort _dims;
     private readonly INativeMethods _native;
     private IntPtr _index;
+    private readonly List<VectorEntry> _insertedVectors = new();
     private bool _disposedFlag;
 
 
@@ -72,6 +74,8 @@ public partial class VictorSDK : IDisposable
     }
 
 #nullable disable
+
+    public IReadOnlyList<VectorEntry> GetInsertedVectors() => _insertedVectors;
 
 }
 

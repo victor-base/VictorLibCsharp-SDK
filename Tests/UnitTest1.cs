@@ -96,10 +96,48 @@ internal class VictorSDKTests
     [Test]
     public void InitFlatIndex_ShouldWorkWithoutContext()
     {
-        VictorSDK sdk = new(type: IndexType.FLAT, method: DistanceMethod.EUCLIDIAN, dims: 128, context: null);
+        VictorSDK sdk = new(type: IndexType.HNSW, method: DistanceMethod.EUCLIDIAN, dims: 128, context: HNSWContext.Create());
         Assert.IsNotNull(sdk);
     }
 
+    [Test]
+    public void DoubleUsing_DumpFlat_ThenLoadHNSW()
+    {
+        ushort dims = 128;
+        string path;
+
+        // PRIMER USING: índice FLAT → inserción rápida y persistencia
+        using (VictorSDK flat = new(IndexType.FLAT, DistanceMethod.COSINE, dims))
+        {
+            for (ulong i = 1; i <= 100; i++)
+            {
+                float[] vector = Enumerable.Repeat((float)i / 100, dims).ToArray();
+                flat.Insert(i, vector, dims);
+            }
+
+            // Persistencia automática en carpeta ./.victor/
+            path = VictorPersistence.DumpToAutoPath(flat, dims, IndexType.FLAT, DistanceMethod.COSINE);
+
+            Console.WriteLine($"Índice FLAT dumpeado a: {path}");
+        }
+
+        // SEGUNDO USING: índice HNSW → carga del dump y búsqueda eficiente
+        // Paso 2: cargar el snapshot y reinsertar en índice HNSW
+        var snapshot = VictorPersistence.ReadSnapshot(path);
+
+        using (VictorSDK hnsw = new(IndexType.HNSW, snapshot.Method, snapshot.Dimensions, HNSWContext.Create()))
+        {
+            foreach (var entry in snapshot.Vectors) hnsw.Insert(entry.Id, entry.Vector, snapshot.Dimensions);
+
+            float[] query = Enumerable.Repeat(0.33f, dims).ToArray();
+            var result = hnsw.Search(query, dims);
+
+            Console.WriteLine($"Resultado: ID = {result.Label}, Distancia = {result.Distance}");
+            Assert.IsTrue(result.Label > 0);
+        }
+    }
+
+    // Double using pattern: primero FLAT, luego HNSW
     [Test]
     public void DoubleUsing_DumpFromFlatAndSearchWithHNSW_ShouldSucceed()
     {
@@ -145,9 +183,6 @@ internal class VictorSDKTests
             File.Delete(path);
         }
     }
-
-
-
 
 
     [Test]
