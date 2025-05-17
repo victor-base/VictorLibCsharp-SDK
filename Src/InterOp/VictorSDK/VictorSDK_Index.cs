@@ -200,7 +200,7 @@ public static class VictorPersistence
 
 		if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
 
-		string fileName = $"victor_index_{DateTime.Now:yyyyMMdd_HHmmss}_{Guid.NewGuid()}.json";
+		string fileName = $"victor_index_{DateTime.Now:yyyyMMdd_HHmmss}_.json";
 		string fullPath = Path.Combine(folder, fileName);
 
 		DumpToFile(sdk, fullPath, dims, type, method, vectors);
