@@ -15,7 +15,7 @@ Este proyecto sigue [Semantic Versioning](https://semver.org/lang/es/).
 - **Suite de testing unitaria completa** con `NUnit`.
 - Sistema de **benchmark**: compara rendimiento en inserción de los índices `FLAT`, `NSW` y `HNSW` (min, max y promedio).
 - Clase `VictorRenderTest` para realizar mediciones de performance.
-- **Métodos más semánticos** (por ejemplo, `IndexType.HNSW` en vez de usar códigos mágicos).
+- **Métodos más semánticos** (por ejemplo, `IndexType.HNSW` en vez de usar códigos numéricos).
 - Agregada compatibilidad básica para `Linux` y arquitectura extensible para multiplataforma.
 
 ### 🛠 Cambiado
