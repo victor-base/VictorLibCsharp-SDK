@@ -17,8 +17,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- *   Esta es la suite de pruebas unitarias para el SDK de Victor.
- *   Buscamos testear la funcionalidad de la clase VictorSDK y sus métodos.
  */
 
 using System;

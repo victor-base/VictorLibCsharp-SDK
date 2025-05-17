@@ -32,6 +32,9 @@ Src/
       VictorLib.cs
       VictorSDK_Index.cs
       VictorSDKAsort.cs
+    Snapshots/
+      Snapshot.cs
+      VictorEntry.cs
 Tests/
   UnitTest1.cs
 Examples/
