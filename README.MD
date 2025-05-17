@@ -12,14 +12,14 @@
 
 ## CHANGELOG
 
-- ➡ [Changelog](./CHANGELOGESP.MD) (Español)
+- ➡ [Changelog](./CHANGELOG2.md) (Español)
 - ➡ [Changelog](./CHANGELOG.md) (English)
 
 ---
 
 ## Estructura del proyecto / Project Structure
 
-```
+```file
 Src/
   Common/
     Mapping.cs
