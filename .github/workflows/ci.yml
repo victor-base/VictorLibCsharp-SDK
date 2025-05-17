@@ -21,10 +21,6 @@ jobs:
       with:
         dotnet-version: 8.0
 
-    - name: Copiar libvictor.dll al proyecto
-      run: copy libvictor.dll VictorBaseDotNET\
-      shell: cmd
-
     - name: Restore dependencies
       run: dotnet restore ./VictorBaseDotNET.csproj
 
