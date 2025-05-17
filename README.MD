@@ -3,10 +3,17 @@
 ## Descripción / Description
 
 - **Español:**  
-  VictorLib es el SDK en C# de la librería nativa Victor Base. Te Permite acceso eficiente a funcionalidades de indexación, búsqueda y gestión de vectores, con una API moderna y segura para .NET
+  VictorLib es el SDK en C# de la librería nativa Victor Base. Te Permite acceso eficiente a funcionalidades de indexación, búsqueda y gestión de vectores, con una API moderna, segura y performante para .NET
 
 - **English:**  
   VictorLib is the C# interoperability SDK for the native Victor Base library. It provides efficient access to indexing, search, and vector management features, with a modern and safe API for .NET.
+
+---
+
+## CHANGELOG
+
+- ➡ [Changelog](./CHANGELOG.MD) (Español)
+- ➡ [Changelog](./CHANGELOG.md) (English)
 
 ---
 
