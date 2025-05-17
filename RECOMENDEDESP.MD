@@ -119,4 +119,3 @@ var CustomPath = VictorPersistence.SetBasePath("C:\\MiProyecto\\VectorDumps");
   ]
 }
 ```
-
