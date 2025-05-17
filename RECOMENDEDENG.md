@@ -30,7 +30,7 @@ public void DoubleUsing_DumpFlatAndLoadHNSW_ShouldWork()
     // Step 1: Create FLAT index, insert, and persist
     using (var flat = new VictorSDK(IndexType.FLAT, DistanceMethod.COSINE, dims: 128))
     {
-        for (ulong i = 1; i <= 50; i++)
+        for (ulong i = 1; i <= 50; i++) 
         {
             float[] vector = Enumerable.Repeat((float)i / 100, dims).ToArray();
             flat.Insert(i, vector, dims);

@@ -9,7 +9,6 @@ El patrón `Double Using` es una forma organizada y eficiente de trabajar con í
 - Cargar esos datos en un índice **jerárquico** (como HNSW o NSW) para realizar búsquedas mucho más rápidas.
 - Nos valemos de este patrón debido a que VictorSDK implementa IDisposable para el manejo de recursos, de lo contrario, simplemente tenes que llamar a sdk.Dispose(); al final de cada indexación, búsqueda,etc.
 
-
 ### 🎯 ¿Por qué JSON y no archivos binarios?
 
 A diferencia de los métodos nativos que generan dumps binarios opacos, la persistencia en JSON:
@@ -31,19 +30,19 @@ public void DoubleUsing_DumpFlatAndLoadHNSW_ShouldWork()
 {
 
     // Paso 1: Crear índice FLAT, insertar y persistir
-    using (var flat = new VictorSDK(IndexType.FLAT, DistanceMethod.COSINE,dims: 128))
+    using (VictorSDK flat = new(IndexType.FLAT, DistanceMethod.COSINE,dims: 128))
     {
-        for (ulong i = 1; i <= 50; i++)
+        for (ulong i = 1; i <= 50; i++) // Llenamos de vectores el índice
         {
             float[] vector = Enumerable.Repeat((float)i / 100, dims).ToArray();
             flat.Insert(i, vector, dims);
         }
 
-        // Persistencia automática a archivo JSON (en ./.victor/)
+        // Persistencia automática a archivo JSON (en ./.victor/) puede ser manual en un archivo custom
       string path = VictorPersistence.DumpToAutoPath(flat, dims, IndexType.FLAT, DistanceMethod.COSINE);
     }
 
-    // Paso 2: Cargar en índice jerárquico (HNSW) para búsquedas rápidas
+    // Paso 2: Cargar en índice jerárquico (HNSW) para búsquedas rápidas (HNSW y NSW son más eficientes en búsqueda que en inserción)
     using (var hnsw = VictorPersistence.LoadFromFile(path))
     {
         float[] query = Enumerable.Repeat(0.3f, dims).ToArray();

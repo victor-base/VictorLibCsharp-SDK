@@ -90,9 +90,13 @@ Examples/
   - **Español:** Obtiene estadísticas detalladas del índice (operaciones, tiempos, etc).  
   - **English:** Gets detailed index statistics (operations, timings, etc).
 
-  - **SetBasePath**
+- **SetBasePath**
   - **Español:** Te permite setear una ruta custom para guardar tus archivos json de índices.
   - **English:** Allows you to set a custom file path to save your index json files.
+
+- **DumpToAutoPath**
+  - **Español:** Guarda el/los índices en un json generado en una carpeta llamada ".victorIndex"(generalmente en la carpeta bin/Debug) de manera automática si no le proporcionás una ruta custom.
+  - **English:** Automatically saves the index/indices in a JSON file generated in a folder named ".victorIndex" (normally in bin/Debug) if you don't provide a custom path.
 
 ---
 
