@@ -90,6 +90,10 @@ Examples/
   - **Español:** Obtiene estadísticas detalladas del índice (operaciones, tiempos, etc).  
   - **English:** Gets detailed index statistics (operations, timings, etc).
 
+  - **SetBasePath**
+  - **Español:** Te permite setear una ruta custom para guardar tus archivos json de índices.
+  - **English:** Allows you to set a custom file path to save your index json files.
+
 ---
 
 ## Instalación / Installation
@@ -112,7 +116,7 @@ dotnet add package VictorLib --prerelease
 
 ---
 
-## Ejemplo de uso / Usage Example
+## Ejemplo de uso básico/Minimal Usage Example
 
 ### Español
 
@@ -125,7 +129,7 @@ VictorSDK sdk = new(type: IndexType.FLAT, method: DistanceMethod.DOTPROD, dims: 
 sdk.Insert(id: 1,vector: new float[128],dims: 128);
 
 // Buscar un vector
-MatchResult result = sdk.Search(new float[128], 128);
+var result = sdk.Search(new float[128], 128);
 Console.WriteLine($"Match ID: {result.Label}, Distance: {result.Distance}");
 
 // Obtener el tamaño del índice
@@ -135,7 +139,7 @@ Console.WriteLine($"Index size: {size}");
 // Guardar el índice en un archivo
 sdk.DumpIndex("index_dump.dat");
 
-// Liberar recursos
+// Liberar recursos manualmente.
 sdk.Dispose();
 ```
 
@@ -143,13 +147,13 @@ sdk.Dispose();
 
 ```csharp
 //Hint: VictorSDK implements IDisposable, so you can avoid Dispose() with using to free resources.
-VictorSDK sdk = new VictorSDK(type: IndexType.FLAT, method: DistanceMethod.DOTPROD, dims: 128);
+VictorSDK sdk = new (type: IndexType.FLAT, method: DistanceMethod.DOTPROD, dims: 128);
 
 // Insert a vector
 sdk.Insert(1, new float[128], 128);
 
 // Search for a vector
-MatchResult result = sdk.Search(new float[128], 128);
+var result = sdk.Search(new float[128], 128);
 Console.WriteLine($"Match ID: {result.Label}, Distance: {result.Distance}");
 
 // Get the size of the index
@@ -159,7 +163,7 @@ Console.WriteLine($"Index size: {size}");
 // Save the index to a file
 sdk.DumpIndex("index_dump.dat");
 
-// Release resources
+// Release resources manually
 sdk.Dispose();
 ```
 
@@ -179,6 +183,10 @@ sdk.Dispose();
   - Compatible con Windows y Linux (x64).
   - Requiere la biblioteca nativa Victor Base instalada y accesible en el sistema.
 
+- **DevX:**
+  - Más abajo te cuento cómo recomiendo usar los métodos en un ejemplo más detallado aprovechando mejor la potencia de la lib. Consultar: "Buenas prácticas / Good coding".
+  - Below you will find a more detailed example showing how to make the most of the library's features. See: "Good coding" for best practices.
+
 ---
 
 ## Notas sobre tipos de índices y métodos de búsqueda / Notes on Index Types and Search Methods
@@ -195,8 +203,9 @@ sdk.Dispose();
   - Uso recomendado para grandes volúmenes de datos y búsquedas rápidas.
 
 **Nota:**  
-> Todos los tipos de índice aceptan `null` como contexto en el constructor.  
-> El contexto solo es obligatorio para `HNSW` y `NSW` si quieres personalizar parámetros.
+
+- Todos los tipos de índice aceptan `null` como contexto en el constructor.  
+- El contexto solo es obligatorio para `HNSW` y `NSW` si quieres personalizar parámetros.
 
 ### Métricas de distancia / Distance Metrics
 
@@ -211,7 +220,6 @@ sdk.Dispose();
 - **dotproduct:**  
   - Calcula el producto punto entre dos vectores.
   - Útil para tareas de ranking y algunas aplicaciones de machine learning.
-
 
 ### Métodos de búsqueda / Search Methods
 
@@ -232,15 +240,16 @@ sdk.Dispose();
 ### Ejemplo de inicialización con y sin contexto
 
 ```csharp
-// FLAT index (contexto puede ser null)
+// FLAT index 
 var flatSdk = new VictorSDK(type: IndexType.FLAT, method: DistanceMethod.DOTPROD, dims: 128, context: null);
 
-// HNSW index (con contexto personalizado)
+// HNSW index 
 var hnswContext = HNSWContext.Create(efConstruct: 200, efSearch: 100, m0: 32);
-var hnswSdk = new VictorSDK(type: IndexType.HNSW, method: DistanceMethod.EUCLIDIAN, dims: 128, context: hnswContext);
+VictorSDK hnswSdk = new (type: IndexType.HNSW, method: DistanceMethod.COSINE, dims: 128, context: hnswContext);
 
-// HNSW index (con contexto por defecto)
-var hnswDefaultSdk = new VictorSDK(type: IndexType.HNSW, method: DistanceMethod.COSINE, dims: 128, context: null);
+// HNSW index 
+VictorSDK hnswDefaultSdk = new (type: IndexType.HNSW, method: DistanceMethod.COSINE, dims: 128, context: null);
+
 ```
 
 ---
@@ -272,10 +281,10 @@ var hnswDefaultSdk = new VictorSDK(type: IndexType.HNSW, method: DistanceMethod.
   - Computes the dot product between two vectors.
   - Useful for ranking tasks and some machine learning applications.
 
-
 **Note:**  
-> All index types accept `null` as the context in the constructor.  
-> The context is only required for `HNSW` and `NSW` if you want to customize parameters.
+
+- All index types accept `null` as the context in the constructor.  
+- The context is only required for `HNSW` and `NSW` if you want to customize parameters.
 
 ### Search Methods
 
@@ -301,15 +310,23 @@ var flatSdk = new VictorSDK(type: IndexType.FLAT, method: DistanceMethod.DOTPROD
 
 // HNSW index (with custom context)
 var hnswContext = HNSWContext.Create(efConstruct: 200, efSearch: 100, m0: 32);
-var hnswSdk = new VictorSDK(type: IndexType.HNSW, method: DistanceMethod.COSINE, dims: 128, context: hnswContext);
+VictorSDK hnswSdk = new (type: IndexType.HNSW, method: DistanceMethod.COSINE, dims: 128, context: hnswContext);
 
-// HNSW index (with default context)
-var hnswDefaultSdk = new VictorSDK(type: IndexType.HNSW, method: DistanceMethod.COSINE, dims: 128, context: null);
+// HNSW index 
+VictorSDK hnswDefaultSdk = new (type: IndexType.HNSW, method: DistanceMethod.COSINE, dims: 128, context: null);
 ```
 
 ---
 
-...
+## Buenas prácticas / Good coding
+
+- Un pequeño archivo de docs adicional donde te muestro cómo recomiendo usar las funciones de persistencia, y un patrón de diseño que recomiendo mientras uses la librería.
+
+[📖 Recomendado: Patrón Double Using + Persistencia JSON (Español)](./RECOMENDEDESP.MD)
+
+- A little file where i show you how to use the Json persistence methods & a design pattern
+
+[📖 Recommended: Double Using + JSON Persistence Pattern (English)](./RECOMENDEDENG.md)
 
 ---
 
@@ -317,7 +334,7 @@ var hnswDefaultSdk = new VictorSDK(type: IndexType.HNSW, method: DistanceMethod.
 
 ### Español
 
-Las contribuciones son bienvenidas. Por favor, abre un issue o un pull request siguiendo este formato:
+Las contribuciones son bienvenidas. Por favor, abrí un issue o un pull request siguiendo este formato:
 
 ```bash
 git checkout -b feature/nombre-del-issue
@@ -336,16 +353,16 @@ git checkout -b feature/issue-name
 ## Créditos y Licencia / Credits & License
 
 - **Español:**  
-  Este SDK complementa Victor Base (https://github.com/victor-base), un proyecto de Emiliano A. Billi.  
+  Este SDK complementa Victor Base <https://github.com/victor-base>, un proyecto de Emiliano A. Billi.  
   SDK desarrollado por Iván E. Rodríguez bajo licencia LGPL-3.0.
 
 - **English:**  
-  This SDK complements Victor Base (https://github.com/victor-base), a project by Emiliano A. Billi.  
+  This SDK complements Victor Base <https://github.com/victor-base>, a project by Emiliano A. Billi.  
   SDK developed by Iván E. Rodríguez under LGPL-3.0 license.
 
 ---
 
 ## Soporte / Support
 
-- Para consultas técnicas: ivanrwcm25@gmail.com  
-- Más información sobre el desarrollador: https://ivanrodportolio.netlify.app/
+- Para consultas técnicas: <ivanrwcm25@gmail.com>  
+- Más información sobre el desarrollador: <https://ivanrodportolio.netlify.app/>

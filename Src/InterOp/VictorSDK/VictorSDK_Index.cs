@@ -62,15 +62,15 @@ public partial class VictorSDK : IDisposable
 	/// <remarks>
 	/// ESP: Guarda el índice actual en un archivo.
 	/// </remarks>
-	public void DumpIndex(string filename)
-	{
-		if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
+	// public void DumpIndex(string filename)
+	// {
+	// 	if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
 
-		int status = _native.dump(_index, filename);
-		if (status != 0) throw new VictorException($"\nError dumping index to file: {filename}\n", ErrorCode.INVALID_FILE);
+	// 	int status = _native.dump(_index, filename);
+	// 	if (status != 0) throw new VictorException($"\nError dumping index to file: {filename}\n", ErrorCode.INVALID_FILE);
 
-		Debug.WriteLine($"\nIndex dumped successfully to file: {filename}.\n");
-	}
+	// 	Debug.WriteLine($"\nIndex dumped successfully to file: {filename}.\n");
+	// }
 
 
 
@@ -85,16 +85,16 @@ public partial class VictorSDK : IDisposable
 	/// </remarks>
 	public bool Contains(params ulong[] ids)
 	{
-		if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
-		if (ids == null || ids.Length == 0) throw new ArgumentException("At least one ID must be provided.", nameof(ids));
+		if (_index == IntPtr.Zero) throw new VictorException("\nIndex not created.\n", ErrorCode.INVALID_INDEX);
+		if (ids == null || ids.Length == 0) throw new VictorException("At least one ID must be provided.", ErrorCode.INVALID_ARGUMENT);
 
 		foreach (var id in ids)
 		{
 			int result = _native.contains(_index, id);
-			if (result < 0) throw new InvalidOperationException($"\nError checking if ID {id} exists in the index.\n");
-			if (result == 0) return false; // ID not found
+			if (result < 0) throw new VictorException($"\nError checking if ID {id} exists in the index.\n", ErrorCode.INVALID_ID);
+			if (result == 0) return false; // ID directamente no existe
 		}
-
+		Debug.WriteLine($"\nAll IDs exist in the index.\n");
 		return true;
 	}
 
@@ -176,7 +176,7 @@ public static class VictorPersistence
 
 
 	/// <summary>
-	/// Permite configurar una ruta base para guardar archivos.
+	/// ENG: Allows set an custom file path to dump index. ESP:Permite configurar una ruta custom base para guardar archivos.
 	/// </summary>
 	public static void SetBasePath(string path) => _customBasePath = path;
 
@@ -206,7 +206,6 @@ public static class VictorPersistence
 		DumpToFile(sdk, fullPath, dims, type, method, vectors);
 		EnsureGitIgnore(folder);
 
-		Console.WriteLine($"\nIndex dumped successfully to file: {fullPath}.\n");
 		Debug.WriteLine($"\nIndex dumped successfully to file: {fullPath}.\n");
 
 		return fullPath;
@@ -216,19 +215,18 @@ public static class VictorPersistence
 	{
 		string gitignore = Path.Combine(folder, ".gitignore");
 
-		if (!File.Exists(gitignore)) File.WriteAllText(gitignore, "*\n!.gitignore\n");
-
-		else
+		if (File.Exists(gitignore))
 		{
+
 			var lines = File.ReadAllLines(gitignore).ToList();
 			bool modified = false;
-
-			if (!lines.Contains("*")) { lines.Add("*"); modified = true; }
-			if (!lines.Contains("!.gitignore")) { lines.Add("!.gitignore"); modified = true; }
+			if (!lines.Contains("*")) lines.Add("*"); modified = true;
+			if (!lines.Contains("!.gitignore")) lines.Add("!.gitignore"); modified = true;
 
 			if (modified) File.WriteAllLines(gitignore, lines);
-		}
 
+			return;
+		}
 		File.WriteAllText(gitignore, "*\n!.gitignore\n");
 	}
 
@@ -244,18 +242,27 @@ public static class VictorPersistence
 	///<returns>A <see cref="VictorSDK"/>This function does not have any return.</returns>
 	public static void DumpToFile(VictorSDK sdk, string path, ushort dims, IndexType type, DistanceMethod method, IEnumerable<VectorEntry> vectors)
 	{
-		VictorIndexSnapshot snapshot = new()
+		try
 		{
-			Dimensions = dims,
-			IndexType = type,
-			Method = method,
-			Vectors = vectors.ToList()
-		};
+			VictorIndexSnapshot snapshot = new() // Creo un modelo del snapshot que despues se serializa para guardarse en forma de Json
+			{
+				Dimensions = dims,
+				IndexType = type,
+				Method = method,
+				Vectors = vectors.ToList()
+			};
 
-		string json = JsonSerializer.Serialize(snapshot, new JsonSerializerOptions { WriteIndented = true });
-		File.WriteAllText(path, json);
-		Console.WriteLine($"\nIndex dumped successfully to file: {path}.\n");
-		Debug.WriteLine($"\nIndex dumped successfully to file: {path}.\n");
+			string json = JsonSerializer.Serialize(snapshot, new JsonSerializerOptions { WriteIndented = true });
+			File.WriteAllText(path, json);
+			Console.WriteLine($"\nIndex dumped successfully to file: {path}.\n");
+			Debug.WriteLine($"\nIndex dumped successfully to file: {path}.\n");
+		}
+		catch
+		{
+
+			throw new VictorException($"\nError dumping index to file: {path}\n", ErrorCode.FILEIO_ERROR);
+		}
+
 	}
 
 	/// <summary>
