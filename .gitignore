@@ -1,7 +1,7 @@
 # Archivos de compilación
 bin/
 obj/
-*.dll
+
 *.exe
 *.pdb
 
