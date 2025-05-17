@@ -19,13 +19,17 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: 8.0
+
+    - name: Copiar libvictor.dll al proyecto
+      run: copy libvictor.dll VictorBaseDotNET\
+      shell: cmd
 
     - name: Restore dependencies
       run: dotnet restore ./VictorBaseDotNET.csproj
 
     - name: Build solution
-      run: dotnet build ./VictorBaseDotNET.csproj --configuration Release /p:TreatWarningsAsErrors=false
+      run: dotnet build ./VictorBaseDotNET.csproj --no-restore --configuration Release /p:TreatWarningsAsErrors=false
 
     - name: Run tests
       run: dotnet test ./VictorBaseDotNET.csproj --no-build --configuration Release --verbosity normal
