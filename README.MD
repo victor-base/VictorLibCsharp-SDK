@@ -12,7 +12,7 @@
 
 ## CHANGELOG
 
-- ➡ [Changelog](./CHANGELOG.MD) (Español)
+- ➡ [Changelog](./CHANGELOGESP.MD) (Español)
 - ➡ [Changelog](./CHANGELOG.md) (English)
 
 ---

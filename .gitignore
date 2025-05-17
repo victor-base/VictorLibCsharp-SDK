@@ -7,7 +7,6 @@ obj/
 
 # Dependencias
 packages/
-*.nupkg
 project.lock.json
 project.assets.json
 
