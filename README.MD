@@ -3,7 +3,7 @@
 ## Descripción / Description
 
 - **Español:**  
-  VictorLib es el SDK de interoperabilidad en C# para la librería nativa Victor Base. Permite acceso eficiente a funcionalidades de indexación, búsqueda y gestión de vectores, con una API moderna y segura para .NET.
+  VictorLib es el SDK en C# de la librería nativa Victor Base. Te Permite acceso eficiente a funcionalidades de indexación, búsqueda y gestión de vectores, con una API moderna y segura para .NET
 
 - **English:**  
   VictorLib is the C# interoperability SDK for the native Victor Base library. It provides efficient access to indexing, search, and vector management features, with a modern and safe API for .NET.
@@ -43,6 +43,7 @@ Examples/
   - `Common` incluye estructuras y utilidades reutilizables.
   - `Tests` contiene pruebas unitarias y de integración.
   - `Examples` incluye ejemplos prácticos de uso.
+  - `Benchmark` Contiene un helper aún no público para medir rendimiento.
 
 - **English:**  
   - `InterOp` contains **VictorSDK**, the abstraction layer over native functions.
@@ -94,7 +95,7 @@ Examples/
   - **Español:** Te permite setear una ruta custom para guardar tus archivos json de índices.
   - **English:** Allows you to set a custom file path to save your index json files.
 
-- **DumpToAutoPath**
+- **DumpToAutoPath (Class VictorPersistence)**
   - **Español:** Guarda el/los índices en un json generado en una carpeta llamada ".victorIndex"(generalmente en la carpeta bin/Debug) de manera automática si no le proporcionás una ruta custom.
   - **English:** Automatically saves the index/indices in a JSON file generated in a folder named ".victorIndex" (normally in bin/Debug) if you don't provide a custom path.
 
