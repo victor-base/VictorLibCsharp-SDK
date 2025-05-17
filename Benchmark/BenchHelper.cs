@@ -7,16 +7,16 @@ using Victor;
 
 namespace VictorBenchmarks;
 
-public class VictorRenderTest
+class VictorRenderTest
 {
 	private readonly VictorSDK _sdk;
 	private readonly List<double> _insertTimes = new();
 	private readonly Stopwatch _sw = new();
 
-	public VictorRenderTest(VictorSDK sdk) => _sdk = sdk;
+	internal VictorRenderTest(VictorSDK sdk) => _sdk = sdk;
 	
 
-	public void InsertMany(int count, int dims)
+	internal void InsertMany(int count, int dims)
 	{
 		for (int i = 0; i < count; i++)
 		{
@@ -28,7 +28,7 @@ public class VictorRenderTest
 		}
 	}
 
-	public BenchmarkResult GetStats()
+	internal BenchmarkResult GetStats()
 	{
 		return new BenchmarkResult
 		{
@@ -40,7 +40,7 @@ public class VictorRenderTest
 		};
 	}
 
-	public record BenchmarkResult
+	internal record BenchmarkResult
 	{
 		public int Count { get; init; }
 		public double Total { get; init; }
