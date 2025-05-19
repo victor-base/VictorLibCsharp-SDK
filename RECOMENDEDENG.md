@@ -24,35 +24,41 @@ Unlike native methods that generate opaque binary dumps, JSON persistence:
 ### 🧪 Full Example of the Double Using Pattern
 
 ```csharp
-  [Test]
-    public void DoubleUsing_FlatDumpToHNSWLoad_SearchShouldWork()
+    [Test]
+    public void DoubleUsing_DumpFlat_ThenLoadHNSW()
     {
         ushort dims = 128;
-        string path;
+        string finalPath;
 
-        // Step 1: Create, insert and dump FLAT index
-        using (var flat = new VictorSDK(IndexType.FLAT, DistanceMethod.COSINE, dims))
+        // PRIMER USING: índice FLAT → inserción rápida y persistencia
+        using (VictorSDK flat = new(IndexType.FLAT, DistanceMethod.COSINE, dims))
         {
-            for (ulong i = 1; i <= 50; i++)
+            for (ulong i = 1; i <= 100; i++)
             {
-                float[] vector = RandomVector();
+                float[] vector = Enumerable.Repeat((float)i / 100, dims).ToArray();
                 flat.Insert(i, vector, dims);
             }
+            VictorPersistence.SetBasePath(@"D:\Users\pc\Desktop\Indices");
+            // Persistencia automática en carpeta ./.victor/
+             finalPath = VictorPersistence.DumpToPath_snapshot(flat);
 
-            // Dump a archivo automático
-            path = VictorPersistence.DumpToPath_snapshot(flat);
-            Debug.WriteLine($"Índice FLAT dumpeado a: {path}");
+            Console.WriteLine($"Índice FLAT dumpeado a: {flat}");
         }
 
-        // step 2: Load HNSW
-        var hnswContext = HNSWContext.Create(efConstruct: 200, efSearch: 100, m0: 32);
-        using (var hnsw = VictorPersistence.LoadFromFile_snapshot(hnswContext, path, overrideType: IndexType.HNSW, overrideMethod:DistanceMethod.DOTPROD))
+        // SEGUNDO USING: índice HNSW → carga del dump y búsqueda eficiente
+        // Paso 2: cargar el snapshot y reinsertar en índice HNSW 
+        var snapshot = VictorPersistence.ReadSnapshot(finalPath);
+        Debug.WriteLine($"Snapshot leído: {snapshot}");
+
+        using (VictorSDK hnsw = new(IndexType.HNSW, snapshot.Method, snapshot.Dimensions, HNSWContext.Create()))
         {
-            float[] query = Enumerable.Repeat(0.3f, dims).ToArray();
+            foreach (var entry in snapshot.Vectors) hnsw.Insert(entry.Id, entry.Vector, snapshot.Dimensions);
+
+            float[] query = Enumerable.Repeat(0.33f, dims).ToArray();
             var result = hnsw.Search(query, dims);
 
-            Debug.WriteLine($"Resultado: ID = {result.Label}, Distancia = {result.Distance}");
-            Assert.IsTrue(result.Label > 0);
+            Console.WriteLine($"Resultado: ID = {result.Label}, Distancia = {result.Distance}");
+            Assert.DoesNotThrow(() => hnsw.Search(query, dims));
         }
     }
 ```
