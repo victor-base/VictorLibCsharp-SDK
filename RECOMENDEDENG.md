@@ -24,43 +24,48 @@ Unlike native methods that generate opaque binary dumps, JSON persistence:
 ### 🧪 Full Example of the Double Using Pattern
 
 ```csharp
-    [Test]
-    public void DoubleUsing_DumpFlat_ThenLoadHNSW()
+   [Test]
+public void DoubleUsing_DumpFlat_ThenLoadHNSW()
+{
+    ushort dims = 128;
+    string finalPath;
+
+    // FIRST USING: Create FLAT index → fast insertion and persistence
+    using (VictorSDK flat = new(IndexType.FLAT, DistanceMethod.COSINE, dims))
     {
-        ushort dims = 128;
-        string finalPath;
-
-        // PRIMER USING: índice FLAT → inserción rápida y persistencia
-        using (VictorSDK flat = new(IndexType.FLAT, DistanceMethod.COSINE, dims))
+        for (ulong i = 1; i <= 100; i++)
         {
-            for (ulong i = 1; i <= 100; i++)
-            {
-                float[] vector = Enumerable.Repeat((float)i / 100, dims).ToArray();
-                flat.Insert(i, vector, dims);
-            }
-            VictorPersistence.SetBasePath(@"D:\Users\pc\Desktop\Indices");
-            // Persistencia automática en carpeta ./.victor/
-             finalPath = VictorPersistence.DumpToPath_snapshot(flat);
-
-            Console.WriteLine($"Índice FLAT dumpeado a: {flat}");
+            float[] vector = Enumerable.Repeat((float)i / 100, dims).ToArray();
+            flat.Insert(i, vector, dims);
         }
 
-        // SEGUNDO USING: índice HNSW → carga del dump y búsqueda eficiente
-        // Paso 2: cargar el snapshot y reinsertar en índice HNSW 
-        var snapshot = VictorPersistence.ReadSnapshot(finalPath);
-        Debug.WriteLine($"Snapshot leído: {snapshot}");
+        // Set custom base path to store the JSON index (option 1)
+        VictorPersistence.SetBasePath(@"D:\Users\pc\Desktop\Indices");
 
-        using (VictorSDK hnsw = new(IndexType.HNSW, snapshot.Method, snapshot.Dimensions, HNSWContext.Create()))
-        {
-            foreach (var entry in snapshot.Vectors) hnsw.Insert(entry.Id, entry.Vector, snapshot.Dimensions);
+        // Auto-generate dump path and serialize snapshot to file (option 2)
+        finalPath = VictorPersistence.DumpToPath_snapshot(flat);
 
-            float[] query = Enumerable.Repeat(0.33f, dims).ToArray();
-            var result = hnsw.Search(query, dims);
-
-            Console.WriteLine($"Resultado: ID = {result.Label}, Distancia = {result.Distance}");
-            Assert.DoesNotThrow(() => hnsw.Search(query, dims));
-        }
+        Console.WriteLine($"[FLAT] Index successfully dumped to: {finalPath}");
+        Assert.IsTrue(File.Exists(finalPath), "Snapshot file was not created.");
     }
+
+    // SECOND USING: Load snapshot and reinsert into an HNSW index
+    var snapshot = VictorPersistence.ReadSnapshot(finalPath);
+    Debug.WriteLine($"[INFO] Snapshot loaded: {snapshot}");
+
+    using (VictorSDK hnsw = new(IndexType.HNSW, snapshot.Method, snapshot.Dimensions, HNSWContext.Create()))
+    {
+        foreach (var entry in snapshot.Vectors)
+            hnsw.Insert(entry.Id, entry.Vector, snapshot.Dimensions);
+
+        float[] query = Enumerable.Repeat(0.33f, dims).ToArray();
+        var result = hnsw.Search(query, dims);
+
+        Console.WriteLine($"[HNSW] Search result: ID = {result.Label}, Distance = {result.Distance}");
+        Assert.DoesNotThrow(() => hnsw.Search(query, dims));
+    }
+}
+
 ```
 
 ## 📂 File Handling and Automatic Persistence
