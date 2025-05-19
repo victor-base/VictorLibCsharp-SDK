@@ -7,16 +7,16 @@ using Victor;
 
 namespace VictorBenchmarks;
 
-class VictorRenderTest
+public class VictorRenderTest
 {
 	private readonly VictorSDK _sdk;
 	private readonly List<double> _insertTimes = new();
 	private readonly Stopwatch _sw = new();
 
-	internal VictorRenderTest(VictorSDK sdk) => _sdk = sdk;
+	public VictorRenderTest(VictorSDK sdk) => _sdk = sdk;
 	
 
-	internal void InsertMany(int count, int dims)
+	public void InsertMany(int count, int dims)
 	{
 		for (int i = 0; i < count; i++)
 		{
@@ -28,7 +28,7 @@ class VictorRenderTest
 		}
 	}
 
-	internal BenchmarkResult GetStats()
+	public BenchmarkResult GetStats()
 	{
 		return new BenchmarkResult
 		{
@@ -40,7 +40,7 @@ class VictorRenderTest
 		};
 	}
 
-	internal record BenchmarkResult
+	public record BenchmarkResult
 	{
 		public int Count { get; init; }
 		public double Total { get; init; }
@@ -55,6 +55,6 @@ class VictorRenderTest
 	private static float[] RandomVector(int dims)
 	{
 		var rand = new Random();
-		return Enumerable.Range(0, dims).Select(_ => (float)rand.NextDouble()).ToArray();
+		return Enumerable.Range(128 ,dims).Select(_ => (float)rand.NextDouble()).ToArray();
 	}
 }

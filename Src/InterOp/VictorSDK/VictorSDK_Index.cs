@@ -23,6 +23,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using Victor.NativeMethods.Factory;
 using VictorBaseDotNET.Src.utils;
 using VictorExceptions;
 using VictorSnapshots;
@@ -31,6 +32,22 @@ namespace Victor;
 
 public partial class VictorSDK : IDisposable
 {
+
+	public VictorSDK(IntPtr nativeIndex)
+	{
+		_native = NativeMethodsFactory.Create();
+		_index = nativeIndex;
+		_insertedVectors = new(); // Como no tenés los vectores, lo dejás vacío
+		_disposedFlag = false;
+
+
+		_indexType = 0x00;
+		_method = DistanceMethod.COSINE;
+		_dims = 0;
+
+		Debug.WriteLine($"Índice cargado desde puntero nativo: {_index}");
+	}
+
 
 	/// <summary>
 	/// Updates the index context with the provided pointer.
@@ -62,15 +79,15 @@ public partial class VictorSDK : IDisposable
 	/// <remarks>
 	/// ESP: Guarda el índice actual en un archivo.
 	/// </remarks>
-	// public void DumpIndex(string filename)
-	// {
-	// 	if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
+	public void DumpIndex_binary(string filename)
+	{
+		if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
 
-	// 	int status = _native.dump(_index, filename);
-	// 	if (status != 0) throw new VictorException($"\nError dumping index to file: {filename}\n", ErrorCode.INVALID_FILE);
+		int status = _native.dump(_index, filename);
+		if (status != 0) throw new VictorException($"\nError dumping index to file: {filename}\n", ErrorCode.INVALID_FILE);
 
-	// 	Debug.WriteLine($"\nIndex dumped successfully to file: {filename}.\n");
-	// }
+		Debug.WriteLine($"\nIndex dumped successfully to file: {filename}.\n");
+	}
 
 
 
@@ -130,16 +147,16 @@ public partial class VictorSDK : IDisposable
 	/// <remarks>
 	/// ESP: Carga un índice desde un archivo.
 	/// </remarks>
-	// public VictorSDK LoadIndex(string filename)
-	// {
-	// 	IntPtr index = _native.load_index(filename);
+	public VictorSDK LoadIndex_binary(string filename)
+	{
+		IntPtr index = _native.load_index(filename);
 
-	// 	if (index == IntPtr.Zero) throw new InvalidOperationException($"\nError loading index from file: {filename}\n");
+		if (index == IntPtr.Zero) throw new InvalidOperationException($"\nError loading index from file: {filename}\n");
 
-	// 	Debug.WriteLine($"\nÍndice cargado correctamente desde el archivo {filename}.\n");
+		Debug.WriteLine($"\nÍndice cargado correctamente desde el archivo {filename}.\n");
 
-	// 	return new VictorSDK(index);
-	// }
+		return new VictorSDK(index);
+	}
 
 
 
@@ -182,19 +199,23 @@ public static class VictorPersistence
 
 
 	// overload del metodo para simplificar laburo al dev
-	public static string DumpToAutoPath(VictorSDK sdk, ushort dims, IndexType type, DistanceMethod method) => DumpToAutoPath(sdk, dims, type, method, sdk.GetInsertedVectors());
 
 	/// <summary>
-	/// ENG: Dumps generated index with a auto file path. ESP: Dump del índice a archivo con ruta generada automáticamente.
+	/// ENG: Dumps generated index with a auto file path if we dont provide a custom one. ESP: Dump del índice a archivo con ruta generada automáticamente si no le proporcionamos una ruta custom.
 	/// </summary>
 	/// <param name="sdk">Instancia de <see cref="VictorSDK"/>.</param>
-	/// <param name="dims">Dimensiones del índice.</param>
-	/// <param name="type">Tipo de índice.</param>
-	/// <param name="method">Método de distancia.</param>
+	/// <returns>Ruta del archivo generado.</returns>
+	/// <exception cref="VictorException">Lanza una excepción si no se puede serializar el índice.</exception>
+	public static string DumpToPath_snapshot(VictorSDK sdk) => DumpToPath_snapshot(sdk, sdk.GetInsertedVectors());
+
+	/// <summary>
+	/// ENG: Dumps generated index with a auto file path if we dont provide a custom one. ESP: Dump del índice a archivo con ruta generada automáticamente si no le proporcionamos una ruta custom.
+	/// </summary>
+	/// <param name="sdk">Instancia de <see cref="VictorSDK"/>.</param>
 	/// <param name="vectors">Vectores a serializar.</param>
 	/// <returns>Ruta del archivo generado.</returns>
 	/// <exception cref="VictorException">Lanza una excepción si no se puede serializar el índice.</exception>
-	public static string DumpToAutoPath(VictorSDK sdk, ushort dims, IndexType type, DistanceMethod method, IEnumerable<VectorEntry> vectors)
+	public static string DumpToPath_snapshot(VictorSDK sdk, IEnumerable<VectorEntry> vectors)
 	{
 		string folder = _customBasePath ?? Path.Combine(Directory.GetCurrentDirectory(), ".victorIndex");
 
@@ -203,13 +224,14 @@ public static class VictorPersistence
 		string fileName = $"victor_index_{DateTime.Now:yyyyMMdd_HHmmss}_.json";
 		string fullPath = Path.Combine(folder, fileName);
 
-		DumpToFile(sdk, fullPath, dims, type, method, vectors);
+		DumpToFile_snapshot(sdk, fullPath, vectors);
 		EnsureGitIgnore(folder);
 
 		Debug.WriteLine($"\nIndex dumped successfully to file: {fullPath}.\n");
 
 		return fullPath;
 	}
+
 
 	private static void EnsureGitIgnore(string folder)
 	{
@@ -235,27 +257,26 @@ public static class VictorPersistence
 	/// <summary> ENG: Dumps the current index to a JSON file at the specified path. ESP: Persiste el índice seleccionado en un archivo Json. </summary>
 	/// <param name="sdk">The instance of <see cref="VictorSDK"/> associated with the operation.</param>
 	/// <param name="path">The file path where the JSON output will be written.</param>
-	/// <param name="dims">The number of dimensions for the vectors.</param>
-	/// <param name="type">The type of index to be used.</param>
-	/// <param name="method">The distance method to be applied.</param>
 	/// <param name="vectors">A collection of <see cref="VectorEntry"/> objects to be serialized.</param>
 	///<returns>A <see cref="VictorSDK"/>This function does not have any return.</returns>
-	public static void DumpToFile(VictorSDK sdk, string path, ushort dims, IndexType type, DistanceMethod method, IEnumerable<VectorEntry> vectors)
+	private static void DumpToFile_snapshot(VictorSDK sdk, string path, IEnumerable<VectorEntry> vectors)
 	{
 		try
 		{
-			VictorIndexSnapshot snapshot = new() // Creo un modelo del snapshot que despues se serializa para guardarse en forma de Json
+
+			VictorIndexSnapshot snapshot = new()
 			{
-				Dimensions = dims,
-				IndexType = type,
-				Method = method,
-				Vectors = vectors.ToList()
+				Dimensions = sdk._dims,
+				IndexType = sdk._indexType,
+				Method = sdk._method,
+				Vectors = sdk.GetInsertedVectors().ToList()
 			};
 
 			string json = JsonSerializer.Serialize(snapshot, new JsonSerializerOptions { WriteIndented = true });
 			File.WriteAllText(path, json);
-			Console.WriteLine($"\nIndex dumped successfully to file: {path}.\n");
 			Debug.WriteLine($"\nIndex dumped successfully to file: {path}.\n");
+
+
 		}
 		catch
 		{
@@ -268,29 +289,39 @@ public static class VictorPersistence
 	/// <summary>
 	/// Loads a <see cref="VictorSDK"/> ENG: instance from a JSON file at the specified path.  ESP: Carga una instancia de <see cref="VictorSDK"/> desde un archivo JSON en la ruta especificada.
 	/// </summary>
+	/// <param name="customContext"></param>
 	/// <param name="path">The file path to the JSON file containing the index snapshot.</param>
+	/// <param name="overrideType"></param>
+	/// <param name="overrideMethod"></param>
 	/// <returns>A <see cref="VictorSDK"/> instance initialized with the data from the file.</returns>
 	///<exception cref="InvalidOperationException">Thrown if the index is not created or if there is an error deleting the vector.</exception>
-	public static VictorSDK LoadFromFile(string path)
+	public static VictorSDK LoadFromFile_snapshot(object? customContext, string path, IndexType? overrideType = null, DistanceMethod? overrideMethod = null) // ahora puedo mutar el tipo de índice al cargar el snapshot
 	{
+
 		string json = File.ReadAllText(path);
+
+		if (string.IsNullOrEmpty(json)) throw new VictorException("El archivo está vacío o no se pudo leer.", ErrorCode.FILEIO_ERROR);
+		if (!json.Contains("IndexType")) throw new VictorException("El archivo no contiene el tipo de índice.", ErrorCode.FILEIO_ERROR);
+
 		var snapshot = JsonSerializer.Deserialize<VictorIndexSnapshot>(json) ?? throw new VictorException("No se pudo deserializar el índice.", ErrorCode.FILEIO_ERROR);
 
+		IndexType finalIndexType = overrideType ?? snapshot.IndexType;
+		DistanceMethod finalMethod = overrideMethod ?? snapshot.Method;
 
+		VictorSDK sdk = new(finalIndexType, finalMethod, snapshot.Dimensions, customContext);
 
-		object? context = snapshot.IndexType switch
-		{
-			IndexType.HNSW => HNSWContext.Create(),
-			IndexType.NSW => NSWContext.Create(),
-			_ => null
-		};
-
-		VictorSDK sdk = new(snapshot.IndexType, snapshot.Method, snapshot.Dimensions, context);
-
-		foreach (VectorEntry? entry in snapshot.Vectors) sdk.Insert(entry.Id, entry.Vector, snapshot.Dimensions);
+		foreach (var entry in snapshot.Vectors) sdk.Insert(entry.Id, entry.Vector, snapshot.Dimensions);
 
 		return sdk;
 	}
+
+
+/// <summary>
+/// ENG: Reads a snapshot from a JSON file at the specified path. ESP: Lee un snapshot desde un archivo JSON en la ruta especificada.	
+/// </summary>
+/// <param name="path"></param>
+/// <returns></returns>
+/// <exception cref="VictorException"></exception>
 	public static VictorIndexSnapshot ReadSnapshot(string path)
 	{
 		string json = File.ReadAllText(path);

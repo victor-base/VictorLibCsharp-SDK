@@ -38,19 +38,15 @@ namespace Victor;
 
 public partial class VictorSDK : IDisposable
 {
+    private readonly List<VectorEntry> _insertedVectors = [];
+    private readonly object? _context;
     private readonly INativeMethods _native;
     private IntPtr _index;
-    private readonly List<VectorEntry> _insertedVectors = new();
     private bool _disposedFlag;
+    public readonly IndexType _indexType;
+    public readonly DistanceMethod _method;
+    public readonly ushort _dims;
 
-
-    // Constructor privado para inicializar desde un índice cargado
-    private VictorSDK(IntPtr index)
-    {
-        _native = NativeMethodsFactory.Create();
-        _index = index;
-        Debug.WriteLine("\nIndex loaded successfully.\n");
-    }
 
     /// <summary>
     /// ENG: Creates a new vector index. ESP: Crea un nuevo índice de vectores.
@@ -61,7 +57,11 @@ public partial class VictorSDK : IDisposable
     /// <param name="context">ENG: Optional context for advanced configuration. ESP: Contexto opcional para configuración avanzada.</param>
     public VictorSDK(IndexType type, DistanceMethod method, ushort dims, object? context = null)
     {
-        _native = NativeMethodsFactory.Create();
+        this._context = context;
+        this._indexType = type;
+        this._method = method;
+        this._dims = dims;
+        this._native = NativeMethodsFactory.Create();
 
         IntPtr ctxPtr = IntPtr.Zero;
 
@@ -72,7 +72,15 @@ public partial class VictorSDK : IDisposable
 
 #nullable disable
 
-    public IReadOnlyList<VectorEntry> GetInsertedVectors() => _insertedVectors;
+
+
+    public IReadOnlyList<VectorEntry> GetInsertedVectors()
+    {
+        
+        if (_insertedVectors is null)  throw new InvalidOperationException("No vectors have been inserted yet.");
+
+        return _insertedVectors;
+    }
 
 }
 
@@ -167,17 +175,23 @@ public partial class VictorSDK
     {
         if (_index == IntPtr.Zero) throw new VictorException(ErrorCode.INVALID_INIT);
 
-        if (vector == null || vector.Length == 0) throw new VictorException("Vector is null or empty.", ErrorCode.INVALID_VECTOR);
+        if (vector == null || vector.Length == 0)
+            throw new VictorException("Vector is null or empty.", ErrorCode.INVALID_VECTOR);
 
-        if (vector.Length != dims) throw new VictorException($"\nVector size ({vector.Length}) doesn't match with dimensions :({dims}).\n", ErrorCode.INVALID_DIMENSIONS);
+        if (vector.Length != dims)
+            throw new VictorException($"\nVector size ({vector.Length}) doesn't match with dimensions :({dims}).\n", ErrorCode.INVALID_DIMENSIONS);
 
         int status = _native.insert(_index, id, vector, dims);
 
-        if (status != 0) throw new VictorException($"Insert failed with code {status}", (ErrorCode)status);
+        if (status != 0)
+            throw new VictorException($"Insert failed with code {status}", (ErrorCode)status);
 
-        Debug.WriteLine($"\nVector with ID {id} inserted succesfully.\n");
+        _insertedVectors.Add(new VectorEntry { Id = id, Vector = vector }); // <--- ESTA LÍNEA ES CLAVE
+
+        Debug.WriteLine($"\nVector with ID {id} inserted successfully.\n");
         return status;
     }
+
 
 
     /// <summary>
