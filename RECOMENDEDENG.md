@@ -39,10 +39,10 @@ public void DoubleUsing_DumpFlat_ThenLoadHNSW()
             flat.Insert(i, vector, dims);
         }
 
-        // Set custom base path to store the JSON index (option 1)
+        // Set custom base path to store the JSON index (optional)
         VictorPersistence.SetBasePath(@"D:\Users\pc\Desktop\Indices");
 
-        // Auto-generate dump path and serialize snapshot to file (option 2)
+        // Auto-generate dump path and serialize snapshot to file 
         finalPath = VictorPersistence.DumpToPath_snapshot(flat);
 
         Console.WriteLine($"[FLAT] Index successfully dumped to: {finalPath}");
