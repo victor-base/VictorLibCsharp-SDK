@@ -1,4 +1,4 @@
-# Victor Base C# Binding & SDK - INDEV Beta Final 1.0.11
+# Victor Base C# Binding & SDK - INDEV Beta Final 1.0.12
 
 ## Descripción / Description
 

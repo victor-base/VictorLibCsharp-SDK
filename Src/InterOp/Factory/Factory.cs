@@ -23,6 +23,7 @@
  */
 
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using NativeMethodsInterface;
 using Victor.NativeMethods.Linux;
@@ -36,16 +37,16 @@ internal static class NativeMethodsFactory
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            Console.WriteLine("Creando NativeMethodsWindows");
+            Debug.WriteLine("Creando NativeMethodsWindows");
             return new NativeMethodsWindows();
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
 
-            Console.WriteLine("Creando NativeMethodsLinux");
+            Debug.WriteLine("Creando NativeMethodsLinux");
             return new NativeMethodsLinux();
         }
 
-        else throw new PlatformNotSupportedException("Tu SO no está soportado, capo.");
+        else throw new PlatformNotSupportedException("Your OS is not supported yet :(");
     }
 }

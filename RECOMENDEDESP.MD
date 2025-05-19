@@ -25,45 +25,43 @@ A diferencia de los métodos nativos que generan dumps binarios opacos, la persi
 ### 🧪 Ejemplo completo del patrón Double Using
 
 ```csharp
-[Test]
-public void DoubleUsing_DumpFlatAndLoadHNSW_ShouldWork()
-{
+    [Test]
+    public void DoubleUsing_DumpFlat_ThenLoadHNSW()
+    {
+        ushort dims = 128;
+        string finalPath;
 
-    ushort dims = 128;
-        string path;
-
-        // Paso 1: Crear índice FLAT, insertar y persistir en una ruta custom
-        using (var flat = new VictorSDK(IndexType.FLAT, DistanceMethod.COSINE, dims))
+        // PRIMER USING: índice FLAT → inserción rápida y persistencia
+        using (VictorSDK flat = new(IndexType.FLAT, DistanceMethod.COSINE, dims))
         {
-            for (ulong i = 1; i <= 50; i++)
+            for (ulong i = 1; i <= 100; i++)
             {
-                float[] vector = RandomVector();
+                float[] vector = Enumerable.Repeat((float)i / 100, dims).ToArray();
                 flat.Insert(i, vector, dims);
             }
-
-            // Seteamos la ruta custom
             VictorPersistence.SetBasePath(@"D:\Users\pc\Desktop\Indices");
+            // Persistencia automática en carpeta ./.victor/
+             finalPath = VictorPersistence.DumpToPath_snapshot(flat);
 
-            // Dump a esa ruta
-            path = VictorPersistence.DumpToAutoPath(flat, dims, IndexType.FLAT, DistanceMethod.COSINE);
-            Debug.WriteLine($"Índice FLAT dumpeado a: {path}");
-
-            Assert.That(File.Exists(path), Is.True, "El archivo JSON no fue creado.");
+            Console.WriteLine($"Índice FLAT dumpeado a: {flat}");
         }
 
-        // Paso 2: Cargar como HNSW para búsquedas rápidas
-        var hnswContext = HNSWContext.Create(efConstruct: 200, efSearch: 100, m0: 32);
-        using (var hnsw = VictorPersistence.LoadFromFile(hnswContext, path, overrideType: IndexType.HNSW))
+        // SEGUNDO USING: índice HNSW → carga del dump y búsqueda eficiente
+        // Paso 2: cargar el snapshot y reinsertar en índice HNSW 
+        var snapshot = VictorPersistence.ReadSnapshot(finalPath);
+        Debug.WriteLine($"Snapshot leído: {snapshot}");
+
+        using (VictorSDK hnsw = new(IndexType.HNSW, snapshot.Method, snapshot.Dimensions, HNSWContext.Create()))
         {
-            float[] query = Enumerable.Repeat(0.3f, dims).ToArray();
+            foreach (var entry in snapshot.Vectors) hnsw.Insert(entry.Id, entry.Vector, snapshot.Dimensions);
+
+            float[] query = Enumerable.Repeat(0.33f, dims).ToArray();
             var result = hnsw.Search(query, dims);
 
-            Debug.WriteLine($"Resultado: ID = {result.Label}, Distancia = {result.Distance}");
-            Assert.IsTrue(result.Label > 0);
-            Assert.IsTrue(File.Exists(path), $"El archivo no fue creado: {path}");
-
+            Console.WriteLine($"Resultado: ID = {result.Label}, Distancia = {result.Distance}");
+            Assert.DoesNotThrow(() => hnsw.Search(query, dims));
         }
-}
+    }
 ```
 
 ## 📂 Manejo de archivos y persistencia automática

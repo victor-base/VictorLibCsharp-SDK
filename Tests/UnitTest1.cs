@@ -146,7 +146,7 @@ internal class VictorSDKTests
     public void DoubleUsing_DumpFlat_ThenLoadHNSW()
     {
         ushort dims = 128;
-        string path;
+        string finalPath;
 
         // PRIMER USING: índice FLAT → inserción rápida y persistencia
         using (VictorSDK flat = new(IndexType.FLAT, DistanceMethod.COSINE, dims))
@@ -156,17 +156,17 @@ internal class VictorSDKTests
                 float[] vector = Enumerable.Repeat((float)i / 100, dims).ToArray();
                 flat.Insert(i, vector, dims);
             }
-
+            VictorPersistence.SetBasePath(@"D:\Users\pc\Desktop\Indices");
             // Persistencia automática en carpeta ./.victor/
-            path = VictorPersistence.DumpToPath_snapshot(flat);
+             finalPath = VictorPersistence.DumpToPath_snapshot(flat);
 
-            Console.WriteLine($"Índice FLAT dumpeado a: {path}");
+            Console.WriteLine($"Índice FLAT dumpeado a: {flat}");
         }
 
         // SEGUNDO USING: índice HNSW → carga del dump y búsqueda eficiente
         // Paso 2: cargar el snapshot y reinsertar en índice HNSW 
-        var snapshot = VictorPersistence.ReadSnapshot(path);
-        Debug.WriteLine($"Snapshot leído: {path}");
+        var snapshot = VictorPersistence.ReadSnapshot(finalPath);
+        Debug.WriteLine($"Snapshot leído: {snapshot}");
 
         using (VictorSDK hnsw = new(IndexType.HNSW, snapshot.Method, snapshot.Dimensions, HNSWContext.Create()))
         {

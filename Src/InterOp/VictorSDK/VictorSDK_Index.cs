@@ -193,10 +193,29 @@ public static class VictorPersistence
 
 
 	/// <summary>
-	/// ENG: Allows set an custom file path to dump index. ESP:Permite configurar una ruta custom base para guardar archivos.
+	/// ENG: Sets a custom base directory where index dump files will be stored.
+	/// ESP: Configura una carpeta base personalizada donde se guardarán los archivos de índice.
 	/// </summary>
-	public static void SetBasePath(string path) => _customBasePath = path;
+	public static void SetBasePath(string path)
+	{
+		if (string.IsNullOrWhiteSpace(path))
+			throw new VictorException("Path cannot be null or empty.", ErrorCode.FILEIO_ERROR);
 
+		if (Path.HasExtension(path))
+			throw new VictorException("SetBasePath expects a FOLDER, not a FILE path.", ErrorCode.FILEIO_ERROR);
+
+		if (!Directory.Exists(path))
+			Directory.CreateDirectory(path);
+
+		_customBasePath = path;
+	}
+
+	/// <summary>
+	/// EXPERIMENTAL FEATURE
+	/// ENG: Resets the custom base directory to null.
+	/// ESP: Restablece la carpeta base personalizada a null.
+	/// </summary>
+	public static void ReSetBasePath() => _customBasePath = null;
 
 	// overload del metodo para simplificar laburo al dev
 
@@ -316,17 +335,24 @@ public static class VictorPersistence
 	}
 
 
-/// <summary>
-/// ENG: Reads a snapshot from a JSON file at the specified path. ESP: Lee un snapshot desde un archivo JSON en la ruta especificada.	
-/// </summary>
-/// <param name="path"></param>
-/// <returns></returns>
-/// <exception cref="VictorException"></exception>
+	/// <summary>
+	/// ENG: Reads a snapshot from a JSON file at the specified path. ESP: Lee un snapshot desde un archivo JSON en la ruta especificada.	
+	/// </summary>
+	/// <param name="path"></param>
+	/// <returns></returns>
+	/// <exception cref="VictorException">Expected a FILE PATH ...</exception>
+	/// <exception cref="VictorException">The file is empty ...</exception>
+	/// <exception cref="VictorException">Failed to deserialize ...</exception>
 	public static VictorIndexSnapshot ReadSnapshot(string path)
 	{
+		if (!File.Exists(path)) throw new VictorException("Expected a FILE PATH, but got a DIRECTORY OR A INVALID PATH.\nTip: prefix with @ in string literals (e.g. @\"C:\\path\\to\\file.json\")", ErrorCode.FILEIO_ERROR);
+
 		string json = File.ReadAllText(path);
-		return JsonSerializer.Deserialize<VictorIndexSnapshot>(json) ?? throw new VictorException("No se pudo leer el snapshot", ErrorCode.FILEIO_ERROR);
+
+		if (string.IsNullOrWhiteSpace(json)) throw new VictorException("The file is empty or could not be read.", ErrorCode.FILEIO_ERROR);
+
+		return JsonSerializer.Deserialize<VictorIndexSnapshot>(json) ?? throw new VictorException("Failed to deserialize the snapshot JSON.", ErrorCode.FILEIO_ERROR);
 	}
-
-
 }
+
+
