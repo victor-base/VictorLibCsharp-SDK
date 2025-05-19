@@ -7,7 +7,7 @@
 		<DebugType>portable</DebugType>
 		<IncludeBuildOutput>true</IncludeBuildOutput>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<!-- <GeneratePackageOnBuild>true</GeneratePackageOnBuild> -->
 		<PackageId>VictorLib</PackageId>
 		<Version>1.0.10-Finalbeta</Version>
 		<Authors>Iván Rodriguez</Authors>
@@ -33,6 +33,9 @@
 		<PackageIcon>victor.png</PackageIcon>
 		<AssemblyName>VictorSDK</AssemblyName>
 		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<NoWarn>$(NoWarn);1591</NoWarn> 
+
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(RuntimeIdentifier)' == 'win-x64'">
@@ -45,21 +48,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Include="README.md" Pack="true" PackagePath=""/>
+		<Compile Remove="Tests\**\*.cs" />
+		<None Include="README.md" Pack="true" PackagePath="" />
 		<InternalsVisibleTo Include="VictorSDK" />
 		<None Include="libvictor.dll" Pack="true">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<PackagePath>runtimes/win-x64/native/</PackagePath>
 		</None>
 		<None Include="victor.png" Pack="true" PackagePath="\" />
-	</ItemGroup>
-
-
-	<ItemGroup>
-		<PackageReference Include="NUnit" Version="3.14.0" />
-		<PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.4" />
-
 	</ItemGroup>
 
 

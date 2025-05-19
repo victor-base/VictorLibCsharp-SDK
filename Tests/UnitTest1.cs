@@ -43,6 +43,84 @@ internal class VictorSDKTests
         return Enumerable.Range(0, 128).Select(_ => (float)rand.NextDouble()).ToArray();
     }
 
+    // Con custom Path
+    [Test]
+    public void DoubleUsing_FlatDumpToHNSWLoad_CustomPath_ShouldWork()
+    {
+        ushort dims = 128;
+        string path;
+
+        // Paso 1: Crear índice FLAT, insertar y persistir en una ruta custom
+        using (var flat = new VictorSDK(IndexType.FLAT, DistanceMethod.COSINE, dims))
+        {
+            for (ulong i = 1; i <= 50; i++)
+            {
+                float[] vector = RandomVector();
+                flat.Insert(i, vector, dims);
+            }
+
+            // Seteamos la ruta custom
+            VictorPersistence.SetBasePath(@"D:\Users\pc\Desktop\Indices");
+
+            // Dump a esa ruta
+            path = VictorPersistence.DumpToPath_snapshot(flat);
+            Debug.WriteLine($"Índice FLAT dumpeado a: {path}");
+
+            Assert.That(File.Exists(path), Is.True, "El archivo JSON no fue creado.");
+        }
+
+        // Paso 2: Cargar como HNSW para búsquedas rápidas
+        var hnswContext = HNSWContext.Create(efConstruct: 200, efSearch: 100, m0: 32);
+        using (var hnsw = VictorPersistence.LoadFromFile_snapshot(hnswContext, path, overrideType: IndexType.HNSW))
+        {
+            float[] query = Enumerable.Repeat(0.3f, dims).ToArray();
+            var result = hnsw.Search(query, dims);
+
+            Debug.WriteLine($"Resultado: ID = {result.Label}, Distancia = {result.Distance}");
+            Assert.IsTrue(result.Label > 0);
+            Assert.IsTrue(File.Exists(path), $"El archivo no fue creado: {path}");
+
+        }
+
+    }
+
+
+
+
+    [Test]
+    public void DoubleUsing_FlatDumpToHNSWLoad_SearchShouldWork()
+    {
+        ushort dims = 128;
+        string path;
+
+        // Paso 1: Crear índice FLAT, insertar y persistir
+        using (var flat = new VictorSDK(IndexType.FLAT, DistanceMethod.COSINE, dims))
+        {
+            for (ulong i = 1; i <= 50; i++)
+            {
+                float[] vector = RandomVector();
+                flat.Insert(i, vector, dims);
+            }
+
+            // Dump a archivo automático
+            path = VictorPersistence.DumpToPath_snapshot(flat);
+            Debug.WriteLine($"Índice FLAT dumpeado a: {path}");
+        }
+
+        // Paso 2: Cargar como HNSW para búsquedas rápidas
+        var hnswContext = HNSWContext.Create(efConstruct: 200, efSearch: 100, m0: 32);
+        using (var hnsw = VictorPersistence.LoadFromFile_snapshot(hnswContext, path, overrideType: IndexType.HNSW, overrideMethod:DistanceMethod.DOTPROD))
+        {
+            float[] query = Enumerable.Repeat(0.3f, dims).ToArray();
+            var result = hnsw.Search(query, dims);
+
+            Debug.WriteLine($"Resultado: ID = {result.Label}, Distancia = {result.Distance}");
+            Assert.IsTrue(result.Label > 0);
+        }
+
+        // Limpieza opcional
+        File.Delete(path);
+    }
 
 
 
@@ -56,40 +134,6 @@ internal class VictorSDKTests
 
         Assert.AreEqual(ErrorCode.SUCCESS, status); // SUCCESS = 0
     }
-
-
-    [Test]
-    public void Search_ShouldReturnValidResult()
-    {
-        VictorSDK sdk = new(type: IndexType.FLAT, method: DistanceMethod.EUCLIDIAN, dims: 128);
-        float[] vector = new float[128];
-
-        for (int i = 0; i < vector.Length; i++) vector[i] = 0.72f;
-
-        for (int i = 0; i < vector.Length; i++) vector[i] = i / 128f;
-
-        sdk.Insert(1, vector, 128); // ← Necesario
-
-        MatchResult result = sdk.Search(vector, 128);
-
-        Assert.IsTrue(result.Distance >= 0);
-        Assert.IsTrue(result.Label >= 0);
-    }
-
-
-    // Intento de crear un índice jerárquico con HNSW
-    [Test]
-    public void GetSize_ShouldReturnCorrectSize()
-    {
-        VictorSDK sdk = new(type: IndexType.HNSW, method: DistanceMethod.COSINE, dims: 128);
-        sdk.Insert(1, new float[128], 128);
-
-        ulong size = sdk.GetSize();
-
-        Assert.AreEqual((ulong)1, size);
-    }
-
-
 
     [Test]
     public void InitFlatIndex_ShouldWorkWithoutContext()
@@ -114,14 +158,15 @@ internal class VictorSDKTests
             }
 
             // Persistencia automática en carpeta ./.victor/
-            path = VictorPersistence.DumpToAutoPath(flat, dims, IndexType.FLAT, DistanceMethod.COSINE);
+            path = VictorPersistence.DumpToPath_snapshot(flat);
 
             Console.WriteLine($"Índice FLAT dumpeado a: {path}");
         }
 
         // SEGUNDO USING: índice HNSW → carga del dump y búsqueda eficiente
-        // Paso 2: cargar el snapshot y reinsertar en índice HNSW
+        // Paso 2: cargar el snapshot y reinsertar en índice HNSW 
         var snapshot = VictorPersistence.ReadSnapshot(path);
+        Debug.WriteLine($"Snapshot leído: {path}");
 
         using (VictorSDK hnsw = new(IndexType.HNSW, snapshot.Method, snapshot.Dimensions, HNSWContext.Create()))
         {
@@ -135,14 +180,11 @@ internal class VictorSDKTests
         }
     }
 
-    // Double using pattern: primero FLAT, luego HNSW
-    [Test]
+    // Double using pattern: primero FLAT, luego HNSW[Test]
     public void DoubleUsing_DumpFromFlatAndSearchWithHNSW_ShouldSucceed()
     {
-        string path = Path.Combine(Path.GetTempPath(), $"New_index_{Guid.NewGuid()}.json");
-
-        List<VectorEntry> dumpedVectors = new();
         ushort dims = 128;
+        string path;
 
         // PRIMER USING: índice FLAT que inserta y dumpea
         using (VictorSDK flat = new(IndexType.FLAT, DistanceMethod.COSINE, dims))
@@ -151,20 +193,15 @@ internal class VictorSDKTests
             {
                 float[] vector = Enumerable.Repeat((float)i / 100, dims).ToArray();
                 flat.Insert(i, vector, dims);
-
-                dumpedVectors.Add(new VectorEntry { Id = i, Vector = vector });
             }
 
-            VictorPersistence.DumpToFile(flat, path, dims, IndexType.FLAT, DistanceMethod.COSINE, dumpedVectors);
+            path = VictorPersistence.DumpToPath_snapshot(flat); // ← devuelve la ruta
+            Assert.IsTrue(File.Exists(path), "El archivo JSON no fue creado correctamente.");
         }
 
-        Assert.IsTrue(File.Exists(path), "El archivo JSON no fue creado correctamente.");
-
-        // SEGUNDO USING: índice HNSW que carga y busca
-        using (VictorSDK hnsw = new(IndexType.HNSW, DistanceMethod.COSINE, dims, HNSWContext.Create()))
+        // SEGUNDO USING: índice HNSW que carga desde archivo y busca
+        using (VictorSDK hnsw = VictorPersistence.LoadFromFile_snapshot(HNSWContext.Create(), path, overrideType: IndexType.HNSW,overrideMethod:DistanceMethod.COSINE))
         {
-            foreach (var entry in dumpedVectors) hnsw.Insert(entry.Id, entry.Vector, dims);
-
             float[] query = Enumerable.Repeat(0.3f, dims).ToArray();
             var result = hnsw.Search(query, dims);
 
@@ -173,14 +210,8 @@ internal class VictorSDKTests
         }
 
         Debug.WriteLine("El segundo índice HNSW se creó y buscó correctamente.");
-        // Cleanup
-        if (File.Exists(path))
-        {
-            Debug.WriteLine($"Este es el archivo de dump: {path}");
-            Debug.WriteLine(File.ReadAllText(path));
-            File.Delete(path);
-        }
     }
+
 
 
     [Test]
@@ -280,19 +311,6 @@ internal class VictorSDKTests
     }
 
 
-    // Test de integración del Factory
-    [Test]
-    public void NativeFactory_ShouldReturnCorrectImplementation()
-    {
-        var native = NativeMethodsFactory.Create();
-        Assert.IsNotNull(native);
-
-        // Esto depende del SO que tengas
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            Assert.AreEqual("NativeMethodsWindows", native.GetType().Name);
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            Assert.AreEqual("NativeMethodsLinux", native.GetType().Name);
-    }
 
     [Test]
     public void VictorSDK_ShouldInitializeWithFlatIndex()

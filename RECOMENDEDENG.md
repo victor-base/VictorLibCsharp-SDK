@@ -24,39 +24,42 @@ Unlike native methods that generate opaque binary dumps, JSON persistence:
 ### 🧪 Full Example of the Double Using Pattern
 
 ```csharp
-[Test]
-public void DoubleUsing_DumpFlatAndLoadHNSW_ShouldWork()
-{
-    // Step 1: Create FLAT index, insert, and persist
-    using (var flat = new VictorSDK(IndexType.FLAT, DistanceMethod.COSINE, dims: 128))
+  [Test]
+    public void DoubleUsing_FlatDumpToHNSWLoad_SearchShouldWork()
     {
-        for (ulong i = 1; i <= 50; i++) 
+        ushort dims = 128;
+        string path;
+
+        // Step 1: Create, insert and dump FLAT index
+        using (var flat = new VictorSDK(IndexType.FLAT, DistanceMethod.COSINE, dims))
         {
-            float[] vector = Enumerable.Repeat((float)i / 100, dims).ToArray();
-            flat.Insert(i, vector, dims);
+            for (ulong i = 1; i <= 50; i++)
+            {
+                float[] vector = RandomVector();
+                flat.Insert(i, vector, dims);
+            }
+
+            // Dump a archivo automático
+            path = VictorPersistence.DumpToPath_snapshot(flat);
+            Debug.WriteLine($"Índice FLAT dumpeado a: {path}");
         }
 
-        // Automatic persistence to JSON file (in ./.victor/)
-        string path = VictorPersistence.DumpToAutoPath(flat, dims, IndexType.FLAT, DistanceMethod.COSINE);
+        // step 2: Load HNSW
+        var hnswContext = HNSWContext.Create(efConstruct: 200, efSearch: 100, m0: 32);
+        using (var hnsw = VictorPersistence.LoadFromFile_snapshot(hnswContext, path, overrideType: IndexType.HNSW, overrideMethod:DistanceMethod.DOTPROD))
+        {
+            float[] query = Enumerable.Repeat(0.3f, dims).ToArray();
+            var result = hnsw.Search(query, dims);
+
+            Debug.WriteLine($"Resultado: ID = {result.Label}, Distancia = {result.Distance}");
+            Assert.IsTrue(result.Label > 0);
+        }
     }
-
-    // Step 2: Load into hierarchical index (HNSW) for fast searches
-    using (var hnsw = VictorPersistence.LoadFromFile(path))
-    {
-        float[] query = Enumerable.Repeat(0.3f, dims).ToArray();
-        var result = hnsw.Search(query, dims);
-
-        Assert.IsTrue(result.Label > 0);
-        Console.WriteLine($"Match ID: {result.Label}, Distance: {result.Distance}");
-    }
-
-    File.Delete(path); // Optional cleanup
-}
 ```
 
 ## 📂 File Handling and Automatic Persistence
 
-# When you use DumpToAutoPath, the system:
+# When you use DumpToAutoPath, the system
 
 - Creates a `.victor/` folder at the project root if it doesn't exist.
 - Saves the file with a unique name: `victor_index_YYYYMMDD_HHMMSS_GUID.json`
@@ -68,7 +71,7 @@ public void DoubleUsing_DumpFlatAndLoadHNSW_ShouldWork()
 - When you're testing and want to save JSON snapshots for comparison.
 - When developing an app where you need to save and restore persistent indices between runs.
 
-# This ensures:
+# This ensures
 
 - You won't accidentally commit dumps to your repo.
 - You can keep a local collection of snapshots for testing, debugging, etc.

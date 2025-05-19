@@ -29,30 +29,40 @@ A diferencia de los métodos nativos que generan dumps binarios opacos, la persi
 public void DoubleUsing_DumpFlatAndLoadHNSW_ShouldWork()
 {
 
-    // Paso 1: Crear índice FLAT, insertar y persistir
-    using (VictorSDK flat = new(IndexType.FLAT, DistanceMethod.COSINE,dims: 128))
-    {
-        for (ulong i = 1; i <= 50; i++) // Llenamos de vectores el índice
+    ushort dims = 128;
+        string path;
+
+        // Paso 1: Crear índice FLAT, insertar y persistir en una ruta custom
+        using (var flat = new VictorSDK(IndexType.FLAT, DistanceMethod.COSINE, dims))
         {
-            float[] vector = Enumerable.Repeat((float)i / 100, dims).ToArray();
-            flat.Insert(i, vector, dims);
+            for (ulong i = 1; i <= 50; i++)
+            {
+                float[] vector = RandomVector();
+                flat.Insert(i, vector, dims);
+            }
+
+            // Seteamos la ruta custom
+            VictorPersistence.SetBasePath(@"D:\Users\pc\Desktop\Indices");
+
+            // Dump a esa ruta
+            path = VictorPersistence.DumpToAutoPath(flat, dims, IndexType.FLAT, DistanceMethod.COSINE);
+            Debug.WriteLine($"Índice FLAT dumpeado a: {path}");
+
+            Assert.That(File.Exists(path), Is.True, "El archivo JSON no fue creado.");
         }
 
-        // Persistencia automática a archivo JSON (en ./.victor/) puede ser manual en un archivo custom
-      string path = VictorPersistence.DumpToAutoPath(flat, dims, IndexType.FLAT, DistanceMethod.COSINE);
-    }
+        // Paso 2: Cargar como HNSW para búsquedas rápidas
+        var hnswContext = HNSWContext.Create(efConstruct: 200, efSearch: 100, m0: 32);
+        using (var hnsw = VictorPersistence.LoadFromFile(hnswContext, path, overrideType: IndexType.HNSW))
+        {
+            float[] query = Enumerable.Repeat(0.3f, dims).ToArray();
+            var result = hnsw.Search(query, dims);
 
-    // Paso 2: Cargar en índice jerárquico (HNSW) para búsquedas rápidas (HNSW y NSW son más eficientes en búsqueda que en inserción)
-    using (var hnsw = VictorPersistence.LoadFromFile(path))
-    {
-        float[] query = Enumerable.Repeat(0.3f, dims).ToArray();
-        var result = hnsw.Search(query, dims);
+            Debug.WriteLine($"Resultado: ID = {result.Label}, Distancia = {result.Distance}");
+            Assert.IsTrue(result.Label > 0);
+            Assert.IsTrue(File.Exists(path), $"El archivo no fue creado: {path}");
 
-        Assert.IsTrue(result.Label > 0);
-        Console.WriteLine($"Match ID: {result.Label}, Distance: {result.Distance}");
-    }
-
-    File.Delete(path); // Limpieza opcional
+        }
 }
 ```
 
@@ -74,7 +84,7 @@ public void DoubleUsing_DumpFlatAndLoadHNSW_ShouldWork()
 
 - Cuando desarrollás una app donde necesitás guardar y recuperar índices persistentes entre ejecuciones.
 
-# Esto te asegura que:
+# Esto te asegura que
 
 - No vas a subir dumps por accidente al repo.
 
