@@ -39,6 +39,8 @@ A diferencia de los métodos nativos que generan dumps binarios opacos, la persi
                 float[] vector = Enumerable.Repeat((float)i / 100, dims).ToArray();
                 flat.Insert(i, vector, dims);
             }
+
+            // Por si querés persistencia en una ruta custom hacés esto.
             VictorPersistence.SetBasePath(@"D:\Users\pc\Desktop\Indices");
             // Persistencia automática en carpeta ./.victor/
              finalPath = VictorPersistence.DumpToPath_snapshot(flat);
