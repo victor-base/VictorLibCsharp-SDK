@@ -39,9 +39,9 @@ public enum IndexType
 
 public enum DistanceMethod
 {
-    EUCLIDIAN = 0,
-    DOTPROD = 1,
-    COSINE = 2
+    EUCLIDIAN = 0x00,
+    DOTPROD = 0x01,
+    COSINE = 0x02
 }
 
 [StructLayout(LayoutKind.Sequential)]

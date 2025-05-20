@@ -14,7 +14,7 @@ public class VictorRenderTest
 	private readonly Stopwatch _sw = new();
 
 	public VictorRenderTest(VictorSDK sdk) => _sdk = sdk;
-	
+
 
 	public void InsertMany(int count, int dims)
 	{
@@ -40,6 +40,11 @@ public class VictorRenderTest
 		};
 	}
 
+	public static float[] RandomVector()
+	{
+		Random rand = new();
+		return Enumerable.Range(0, 128).Select(_ => (float)rand.NextDouble()).ToArray();
+	}
 	public record BenchmarkResult
 	{
 		public int Count { get; init; }
@@ -55,6 +60,6 @@ public class VictorRenderTest
 	private static float[] RandomVector(int dims)
 	{
 		var rand = new Random();
-		return Enumerable.Range(128 ,dims).Select(_ => (float)rand.NextDouble()).ToArray();
+		return Enumerable.Range(128, dims).Select(_ => (float)rand.NextDouble()).ToArray();
 	}
 }

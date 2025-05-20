@@ -37,11 +37,11 @@ public partial class VictorSDK : IDisposable
 	{
 		_native = NativeMethodsFactory.Create();
 		_index = nativeIndex;
-		_insertedVectors = new(); // Como no tenés los vectores, lo dejás vacío
+		_insertedVectors = new List<VectorEntry>(); 
 		_disposedFlag = false;
 
 
-		_indexType = 0x00;
+		_indexType = 0x00; // FLAT
 		_method = DistanceMethod.COSINE;
 		_dims = 0;
 
@@ -50,12 +50,12 @@ public partial class VictorSDK : IDisposable
 
 
 	/// <summary>
-	/// Updates the index context with the provided pointer.
+	/// ENG: Updates the index context with the provided pointer.
 	/// </summary>
 	/// <param name="icontext">Pointer to the new index context.</param>
 	/// <exception cref="InvalidOperationException">Thrown if the index is not created or if there is an error updating the context.</exception>
 	/// <remarks>
-	/// Actualiza el contexto del índice con el puntero proporcionado.
+	/// ESP: Actualiza el contexto del índice con el puntero proporcionado.
 	/// </remarks>
 	public void UpdateIndexContext(IntPtr icontext)
 	{
@@ -81,7 +81,7 @@ public partial class VictorSDK : IDisposable
 	/// </remarks>
 	public void DumpIndex_binary(string filename)
 	{
-		if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
+		if (_index == IntPtr.Zero) throw new VictorException("\nIndex not created.\n", ErrorCode.INVALID_INDEX);
 
 		int status = _native.dump(_index, filename);
 		if (status != 0) throw new VictorException($"\nError dumping index to file: {filename}\n", ErrorCode.INVALID_FILE);
@@ -127,10 +127,10 @@ public partial class VictorSDK : IDisposable
 	/// </remarks>
 	public ulong GetSize()
 	{
-		if (_index == IntPtr.Zero) throw new InvalidOperationException("\nIndex not created.\n");
+		if (_index == IntPtr.Zero) throw new VictorException("\nIndex not created.\n", ErrorCode.INVALID_INDEX);
 
 		int status = _native.size(_index, out ulong size);
-		if (status != 0) throw new InvalidOperationException("\nError retrieving index size.\n");
+		if (status != 0) throw new VictorException("\nError retrieving index size.\n", ErrorCode.INVALID_DIMENSIONS);
 
 		Debug.Write($"Tamaño del Índice: {size}");
 		return size;
@@ -151,7 +151,7 @@ public partial class VictorSDK : IDisposable
 	{
 		IntPtr index = _native.load_index(filename);
 
-		if (index == IntPtr.Zero) throw new InvalidOperationException($"\nError loading index from file: {filename}\n");
+		if (index == IntPtr.Zero) throw new VictorException($"\nError loading index from file: {filename}\n", ErrorCode.INVALID_FILE);
 
 		Debug.WriteLine($"\nÍndice cargado correctamente desde el archivo {filename}.\n");
 
@@ -172,7 +172,7 @@ public partial class VictorSDK : IDisposable
 	/// </remarks>
 	public int Delete(ulong id)
 	{
-		if (_index == IntPtr.Zero) throw new VictorException("\nIndex not created.\n");
+		if (_index == IntPtr.Zero) throw new VictorException("\nIndex not created.\n", ErrorCode.INVALID_INDEX);
 
 		int status = _native.delete(_index, id);
 
@@ -194,8 +194,11 @@ public static class VictorPersistence
 
 	/// <summary>
 	/// ENG: Sets a custom base directory where index dump files will be stored.
-	/// ESP: Configura una carpeta base personalizada donde se guardarán los archivos de índice.
 	/// </summary>
+	/// <remarks>ESP: Configura una carpeta base personalizada donde se guardarán los archivos de índice.</remarks>
+	/// <param name="path">The custom base directory path.</param>
+	/// <exception cref="VictorException">Thrown if the path is null, empty, or not a directory.</exception>
+	/// <returns>A <see cref="VictorSDK"/> instance initialized with the data from the file.</returns>
 	public static void SetBasePath(string path)
 	{
 		if (string.IsNullOrWhiteSpace(path))
@@ -209,19 +212,21 @@ public static class VictorPersistence
 
 		_customBasePath = path;
 	}
-
+	
 	/// <summary>
-	/// EXPERIMENTAL FEATURE
 	/// ENG: Resets the custom base directory to null.
-	/// ESP: Restablece la carpeta base personalizada a null.
-	/// </summary>
+	///- EXPERIMENTAL FEATURE -
+	///  </summary>
+	/// <remarks>ESP: Restablece la carpeta base personalizada a null.</remarks>
+	/// 
 	public static void ReSetBasePath() => _customBasePath = null;
 
 	// overload del metodo para simplificar laburo al dev
 
 	/// <summary>
-	/// ENG: Dumps generated index with a auto file path if we dont provide a custom one. ESP: Dump del índice a archivo con ruta generada automáticamente si no le proporcionamos una ruta custom.
+	/// ENG: Dumps generated index with a auto file path if we dont provide a custom one. 
 	/// </summary>
+	/// <remarks>ESP: Dump del índice a archivo con ruta generada automáticamente si no le proporcionamos una ruta custom.</remarks>
 	/// <param name="sdk">Instancia de <see cref="VictorSDK"/>.</param>
 	/// <returns>Ruta del archivo generado.</returns>
 	/// <exception cref="VictorException">Lanza una excepción si no se puede serializar el índice.</exception>
@@ -230,6 +235,7 @@ public static class VictorPersistence
 	/// <summary>
 	/// ENG: Dumps generated index with a auto file path if we dont provide a custom one. ESP: Dump del índice a archivo con ruta generada automáticamente si no le proporcionamos una ruta custom.
 	/// </summary>
+	/// <remarks>ESP: Dump del índice a archivo con ruta generada automáticamente si no le proporcionamos una ruta custom.</remarks>
 	/// <param name="sdk">Instancia de <see cref="VictorSDK"/>.</param>
 	/// <param name="vectors">Vectores a serializar.</param>
 	/// <returns>Ruta del archivo generado.</returns>
@@ -273,7 +279,8 @@ public static class VictorPersistence
 
 
 
-	/// <summary> ENG: Dumps the current index to a JSON file at the specified path. ESP: Persiste el índice seleccionado en un archivo Json. </summary>
+	/// <summary> ENG: Dumps the current index to a JSON file at the specified path. </summary>
+	/// <remarks> ESP: Persiste el índice seleccionado en un archivo Json. </remarks>
 	/// <param name="sdk">The instance of <see cref="VictorSDK"/> associated with the operation.</param>
 	/// <param name="path">The file path where the JSON output will be written.</param>
 	/// <param name="vectors">A collection of <see cref="VectorEntry"/> objects to be serialized.</param>
@@ -306,8 +313,9 @@ public static class VictorPersistence
 	}
 
 	/// <summary>
-	/// Loads a <see cref="VictorSDK"/> ENG: instance from a JSON file at the specified path.  ESP: Carga una instancia de <see cref="VictorSDK"/> desde un archivo JSON en la ruta especificada.
+	///ENG:  Loads a <see cref="VictorSDK"/> instance from a JSON file at the specified path.  ESP: Carga una instancia de <see cref="VictorSDK"/> desde un archivo JSON en la ruta especificada.
 	/// </summary>
+	/// <remarks>ESP: Carga una instancia de <see cref="VictorSDK"/> desde un archivo JSON en la ruta especificada.</remarks>
 	/// <param name="customContext"></param>
 	/// <param name="path">The file path to the JSON file containing the index snapshot.</param>
 	/// <param name="overrideType"></param>
@@ -336,8 +344,9 @@ public static class VictorPersistence
 
 
 	/// <summary>
-	/// ENG: Reads a snapshot from a JSON file at the specified path. ESP: Lee un snapshot desde un archivo JSON en la ruta especificada.	
+	/// ENG: Reads a snapshot from a JSON file at the specified path.	
 	/// </summary>
+	/// <remarks>ESP: Lee un snapshot desde un archivo JSON en la ruta especificada.</remarks>
 	/// <param name="path"></param>
 	/// <returns></returns>
 	/// <exception cref="VictorException">Expected a FILE PATH ...</exception>
