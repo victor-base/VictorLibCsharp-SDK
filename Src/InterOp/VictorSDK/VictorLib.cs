@@ -49,8 +49,9 @@ public partial class VictorSDK : IDisposable
 
 
     /// <summary>
-    /// ENG: Creates a new vector index. ESP: Crea un nuevo índice de vectores.
-    /// </summary>
+    /// ENG: Creates a new vector index. 
+    /// </summary> 
+    /// <remarks> ESP: Crea un nuevo índice de vectores.</remarks> 
     /// <param name="type">ENG: Index type (FLAT, HNSW, NSW). ESP: Tipo de índice (FLAT, HNSW, NSW).</param>
     /// <param name="method">ENG: Distance metric. ESP: Métrica de distancia.</param>
     /// <param name="dims">ENG: Number of dimensions. ESP: Número de dimensiones.</param>
@@ -89,8 +90,9 @@ public partial class VictorSDK : IDisposable
 public partial class VictorSDK
 {
     /// <summary>
-    /// ENG: Updates the index context (parameters) at runtime. ESP: Actualiza el contexto (parámetros) del índice en tiempo de ejecución.
+    /// ENG: Updates the index context (parameters) at runtime.
     /// </summary>
+    /// <remarks>ESP: Actualiza el contexto (parámetros) del índice en tiempo de ejecución.</remarks>
     /// <param name="context">ENG: HNSW context. ESP: Contexto HNSW.</param>
     /// <param name="mode">ENG: Update mode. ESP: Modo de actualización.</param>
     public void UpdateContext(HNSWContext context, int mode)
@@ -104,8 +106,9 @@ public partial class VictorSDK
 
 
     /// <summary>
-    /// ENG: Gets the name of the current index. ESP: Obtiene el nombre del índice actual.
+    /// ENG: Gets the name of the current index. 
     /// </summary>
+    /// <remarks>ESP: Obtiene el nombre del índice actual.</remarks>
     /// <returns>ENG: Index name. ESP: Nombre del índice.</returns>
     public string GetIndexName()
     {
@@ -114,8 +117,9 @@ public partial class VictorSDK
     }
 
     /// <summary>
-    /// ENG: Gets the full version of the Victor library. ESP: Obtiene la versión completa de la biblioteca Victor.
+    /// ENG: Gets the full version of the Victor library.     
     /// </summary>
+    /// <remarks>ESP: Este método recupera la versión de la biblioteca Victor.</remarks>
     /// <returns>ENG: Library version. ESP: Versión de la biblioteca.</returns>
     public string GetLibraryVersion()
     {
@@ -165,8 +169,9 @@ public partial class VictorSDK
     }
 
     /// <summary>
-    /// ENG: Inserts a vector into the index. ESP: Inserta un vector en el índice.
+    /// ENG: Inserts a vector into the index.
     /// </summary>
+    /// <remarks>ESP: Este método inserta un vector en el índice.</remarks>
     /// <param name="id">ENG: Unique vector ID. ESP: ID único del vector.</param>
     /// <param name="vector">ENG: Vector data. ESP: Datos del vector.</param>
     /// <param name="dims">ENG: Number of dimensions. ESP: Número de dimensiones.</param>
@@ -195,8 +200,9 @@ public partial class VictorSDK
 
 
     /// <summary>
-    /// ENG: Searches for the closest vector in the index. ESP: Busca el vector más cercano en el índice.
+    /// ENG: Searches for the closest vector in the index.
     /// </summary>
+    /// <remarks>ESP: Este método busca el vector más cercano en el índice.</remarks>
     /// <param name="vector">ENG: Query vector. ESP: Vector de consulta.</param>
     /// <param name="dims">ENG: Number of dimensions. ESP: Número de dimensiones.</param>
     /// <returns>ENG: Match result. ESP: Resultado de la búsqueda.</returns>
@@ -225,8 +231,9 @@ public partial class VictorSDK
 
 
     /// <summary>
-    /// ENG: Searches for the N closest vectors in the index. ESP: Busca los N vectores más cercanos en el índice.
+    /// ENG: Searches for the N closest vectors in the index. 
     /// </summary>
+    /// <remarks>ESP: Este método busca los N vectores más cercanos en el índice.</remarks>
     /// <param name="vector">ENG: Query vector. ESP: Vector de consulta.</param>
     /// <param name="dims">ENG: Number of dimensions. ESP: Número de dimensiones.</param>
     /// <param name="n">ENG: Number of results. ESP: Número de resultados.</param>
@@ -257,8 +264,9 @@ public partial class VictorSDK
 
 
     /// <summary>
-    /// ENG: Gets aggregated statistics of the index. ESP: Obtiene estadísticas agregadas del índice.
+    /// ENG: Gets aggregated statistics of the index.
     /// </summary>
+    /// <remarks>ESP: Este método obtiene estadísticas del índice.</remarks>
     /// <returns>ENG: Index statistics. ESP: Estadísticas del índice.</returns>
     public IndexStatsResult GetStats()
     {
@@ -283,11 +291,10 @@ public partial class VictorSDK
 
 
     /// <summary>
-    /// Releases resources used by the instance and suppresses finalization.
+    ///ENG: Releases resources used by the instance and suppresses finalization.
     /// </summary>
-    /// <remarks>
-    /// Ensures managed and unmanaged resources are properly released to avoid memory leaks.
-    /// </remarks>
+    /// <remarks>ESP: Libera los recursos utilizados por la instancia y suprime la finalización.</remarks>
+    /// <exception cref="ObjectDisposedException">ENG: Thrown if the object has already been disposed. ESP: Lanzado si el objeto ya ha sido eliminado.</exception>
     public void Dispose()
     {
         Dispose(true);

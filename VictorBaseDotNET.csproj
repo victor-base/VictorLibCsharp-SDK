@@ -9,7 +9,7 @@
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<!-- <GeneratePackageOnBuild>true</GeneratePackageOnBuild> -->
 		<PackageId>VictorLib</PackageId>
-		<Version>1.0.11-Finalbeta</Version>
+		<Version>1.0.12-Finalbeta</Version>
 		<Authors>Iván Rodriguez</Authors>
 		<Company>Independent Contributor</Company>
 		<Description>VictorLib is a C# binding SDK for Victor Base native library, providing interop

@@ -37,16 +37,19 @@ namespace Victor.Tests;
 [TestFixture]
 internal class VictorSDKTests
 {
-    static float[] RandomVector()
+    [SetUp]
+    public static float[] RandomVector()
     {
         Random rand = new();
         return Enumerable.Range(0, 128).Select(_ => (float)rand.NextDouble()).ToArray();
     }
 
+
     // Con custom Path
     [Test]
     public void DoubleUsing_FlatDumpToHNSWLoad_CustomPath_ShouldWork()
     {
+
         ushort dims = 128;
         string path;
 
@@ -109,7 +112,7 @@ internal class VictorSDKTests
 
         // Paso 2: Cargar como HNSW para búsquedas rápidas
         var hnswContext = HNSWContext.Create(efConstruct: 200, efSearch: 100, m0: 32);
-        using (var hnsw = VictorPersistence.LoadFromFile_snapshot(hnswContext, path, overrideType: IndexType.HNSW, overrideMethod:DistanceMethod.DOTPROD))
+        using (var hnsw = VictorPersistence.LoadFromFile_snapshot(hnswContext, path, overrideType: IndexType.HNSW, overrideMethod: DistanceMethod.DOTPROD))
         {
             float[] query = Enumerable.Repeat(0.3f, dims).ToArray();
             var result = hnsw.Search(query, dims);
@@ -158,7 +161,7 @@ internal class VictorSDKTests
             }
             VictorPersistence.SetBasePath(@"D:\Users\pc\Desktop\Indices");
             // Persistencia automática en carpeta ./.victor/
-             finalPath = VictorPersistence.DumpToPath_snapshot(flat);
+            finalPath = VictorPersistence.DumpToPath_snapshot(flat);
 
             Console.WriteLine($"Índice FLAT dumpeado a: {flat}");
         }
@@ -200,7 +203,7 @@ internal class VictorSDKTests
         }
 
         // SEGUNDO USING: índice HNSW que carga desde archivo y busca
-        using (VictorSDK hnsw = VictorPersistence.LoadFromFile_snapshot(HNSWContext.Create(), path, overrideType: IndexType.HNSW,overrideMethod:DistanceMethod.COSINE))
+        using (VictorSDK hnsw = VictorPersistence.LoadFromFile_snapshot(HNSWContext.Create(), path, overrideType: IndexType.HNSW, overrideMethod: DistanceMethod.COSINE))
         {
             float[] query = Enumerable.Repeat(0.3f, dims).ToArray();
             var result = hnsw.Search(query, dims);
