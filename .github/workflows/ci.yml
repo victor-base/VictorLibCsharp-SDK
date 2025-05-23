@@ -9,8 +9,32 @@ on:
       - master
 
 jobs:
-  build-and-test:
+  build-and-test-windows:
+    name: Build and Test on Windows
     runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0
+
+    - name: Restore dependencies
+      run: dotnet restore ./VictorBaseDotNET.csproj
+
+    - name: Build solution
+      run: dotnet build ./VictorBaseDotNET.csproj --no-restore --configuration Release /p:TreatWarningsAsErrors=false
+
+    - name: Run tests
+      run: dotnet test ./VictorBaseDotNET.csproj --configuration Release --verbosity normal
+
+  build-and-test-linux:
+    
+    name: Build and Test on Linux
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
