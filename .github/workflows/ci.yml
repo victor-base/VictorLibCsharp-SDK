@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-test-windows:
-    name: 🪟 Build & Test on Windows
+    name: 🟦 Build & Test on Windows
     runs-on: windows-latest
 
     steps:
