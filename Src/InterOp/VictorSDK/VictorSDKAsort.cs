@@ -61,7 +61,7 @@ public partial class VictorSDK : IDisposable
             internalInputs[i] = new InternalMatchResult
             {
                 Distance = inputs[i].Distance,
-                Label = inputs[i].Label // 👈 asegúrate que MatchResult tiene Label, no Id
+                Label = inputs[i].Label 
             };
         }
 
@@ -93,7 +93,7 @@ public partial class VictorSDK : IDisposable
 
         if (result < 0) throw new VictorException($"as_close failed with code {result}");
 
-        asort = StructMapper.MapToPublic(StructMapper.MapFromInterop(internalAsort)); // ✅ simplificado
+        asort = StructMapper.MapToPublic(StructMapper.MapFromInterop(internalAsort)); 
 
         if (!extractResults || result == 0) return [];
 

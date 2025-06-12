@@ -146,7 +146,7 @@ internal struct TimeStat
 internal struct InternalIndexStatsResult
 {
     public TimeStat Insert;
-    public TimeStat Delete; // O Remove, dependiendo del entorno
+    public TimeStat Delete;
     public TimeStat Dump;
     public TimeStat Search;
     public TimeStat SearchN;

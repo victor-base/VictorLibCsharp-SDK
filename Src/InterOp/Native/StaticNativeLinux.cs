@@ -133,7 +133,6 @@ internal static partial class NativeMethodsLinuxStatic
   [DllImport("libvictor.so", CallingConvention = CallingConvention.Cdecl)]
   public static extern int hnsw_index(IntPtr idx, int method, ushort dims, IntPtr context);
 
-
   [DllImport("libvictor.so", CallingConvention = CallingConvention.Cdecl)]
   public static extern IntPtr __LIB_SHORT_VERSION();
 
@@ -154,11 +153,9 @@ internal static partial class NativeMethodsLinuxStatic
   [DllImport("libvictor.so", CallingConvention = CallingConvention.Cdecl)]
   public static extern int nsw_index_load(IntPtr index, IntPtr ioContext);
 
-  // --- Estadísticas / tiempo ---
   [DllImport("libvictor.so", CallingConvention = CallingConvention.Cdecl)]
   public static extern int get_time_ms_monotonic();
 
-  // --- Vector Utils ---
   [DllImport("libvictor.so", CallingConvention = CallingConvention.Cdecl)]
   public static extern void normalize_vector([In, Out] float[] vector, ushort dims);
   [DllImport("libvictor.so", CallingConvention = CallingConvention.Cdecl)]
@@ -167,7 +164,6 @@ internal static partial class NativeMethodsLinuxStatic
   [DllImport("libvictor.so", CallingConvention = CallingConvention.Cdecl)]
   public static extern int nsw_search_n(IntPtr index, float[] vector, ushort dims, [Out] InternalMatchResult[] results, int n);
 
-  // --- Búsqueda HNSW ---
   [DllImport("libvictor.so", CallingConvention = CallingConvention.Cdecl)]
   public static extern int hnsw_search(IntPtr index, float[] vector, ushort dims, [Out] InternalMatchResult result);
 
