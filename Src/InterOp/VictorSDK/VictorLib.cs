@@ -152,12 +152,12 @@ public partial class VictorSDK
 
     public void ThrowIfError(ErrorCode code, int? additionalCode = null)
     {
-        if (code == ErrorCode.SUCCESS) return; // No hay error, salir del método.
+        if (code == ErrorCode.SUCCESS) return; // No hay error salgo del método.
 
         IntPtr ptr = _native.victor_strerror(code);
         string msg = Marshal.PtrToStringAnsi(ptr);
 
-        // Si se proporciona un código adicional, inclúyelo en el mensaje de error.
+       
         if (additionalCode.HasValue)
         {
             throw new VictorException($"Victor error {code} (Additional Code: {additionalCode}): {msg}", code);
@@ -191,7 +191,7 @@ public partial class VictorSDK
         if (status != 0)
             throw new VictorException($"Insert failed with code {status}", (ErrorCode)status);
 
-        _insertedVectors.Add(new VectorEntry { Id = id, Vector = vector }); // <--- ESTA LÍNEA ES CLAVE
+        _insertedVectors.Add(new VectorEntry { Id = id, Vector = vector }); 
 
         Debug.WriteLine($"\nVector with ID {id} inserted successfully.\n");
         return status;

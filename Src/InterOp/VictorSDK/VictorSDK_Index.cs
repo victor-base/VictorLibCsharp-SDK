@@ -37,7 +37,7 @@ public partial class VictorSDK : IDisposable
 	{
 		_native = NativeMethodsFactory.Create();
 		_index = nativeIndex;
-		_insertedVectors = new List<VectorEntry>(); 
+		_insertedVectors = new List<VectorEntry>();
 		_disposedFlag = false;
 
 
@@ -109,7 +109,7 @@ public partial class VictorSDK : IDisposable
 		{
 			int result = _native.contains(_index, id);
 			if (result < 0) throw new VictorException($"\nError checking if ID {id} exists in the index.\n", ErrorCode.INVALID_ID);
-			if (result == 0) return false; // ID directamente no existe
+			if (result == 0) return false;
 		}
 		Debug.WriteLine($"\nAll IDs exist in the index.\n");
 		return true;
@@ -127,10 +127,10 @@ public partial class VictorSDK : IDisposable
 	/// </remarks>
 	public ulong GetSize()
 	{
-		if (_index == IntPtr.Zero) throw new VictorException("\nIndex not created.\n", ErrorCode.INVALID_INDEX);
+		if (_index == IntPtr.Zero)  throw new VictorException("\nIndex not created.\n", ErrorCode.INVALID_INDEX);
 
 		int status = _native.size(_index, out ulong size);
-		if (status != 0) throw new VictorException("\nError retrieving index size.\n", ErrorCode.INVALID_DIMENSIONS);
+		if (status != 0)  throw new VictorException("\nError retrieving index size.\n", ErrorCode.INVALID_DIMENSIONS);
 
 		Debug.Write($"Tamaño del Índice: {size}");
 		return size;
@@ -151,7 +151,7 @@ public partial class VictorSDK : IDisposable
 	{
 		IntPtr index = _native.load_index(filename);
 
-		if (index == IntPtr.Zero) throw new VictorException($"\nError loading index from file: {filename}\n", ErrorCode.INVALID_FILE);
+		if (index == IntPtr.Zero)  throw new VictorException($"\nError loading index from file: {filename}\n", ErrorCode.INVALID_FILE);
 
 		Debug.WriteLine($"\nÍndice cargado correctamente desde el archivo {filename}.\n");
 
@@ -172,11 +172,11 @@ public partial class VictorSDK : IDisposable
 	/// </remarks>
 	public int Delete(ulong id)
 	{
-		if (_index == IntPtr.Zero) throw new VictorException("\nIndex not created.\n", ErrorCode.INVALID_INDEX);
+		if (_index == IntPtr.Zero)  throw new VictorException("\nIndex not created.\n", ErrorCode.INVALID_INDEX);
 
 		int status = _native.delete(_index, id);
 
-		if (status != 0) throw new VictorException($"\nERR: Can't eliminate vector with ID: {id}. status code: {status}\n");
+		if (status != 0)  throw new VictorException($"\nERR: Can't eliminate vector with ID: {id}. status code: {status}\n");
 
 		Debug.WriteLine($"\nVector with ID: {id} eliminated succesfully.\n");
 
@@ -201,14 +201,11 @@ public static class VictorPersistence
 	/// <returns>A <see cref="VictorSDK"/> instance initialized with the data from the file.</returns>
 	public static void SetBasePath(string path)
 	{
-		if (string.IsNullOrWhiteSpace(path))
-			throw new VictorException("Path cannot be null or empty.", ErrorCode.FILEIO_ERROR);
+		if (string.IsNullOrWhiteSpace(path))  throw new VictorException("Path cannot be null or empty.", ErrorCode.FILEIO_ERROR);
 
-		if (Path.HasExtension(path))
-			throw new VictorException("SetBasePath expects a FOLDER, not a FILE path.", ErrorCode.FILEIO_ERROR);
+		if (Path.HasExtension(path))  throw new VictorException("SetBasePath expects a FOLDER, not a FILE path.", ErrorCode.FILEIO_ERROR);
 
-		if (!Directory.Exists(path))
-			Directory.CreateDirectory(path);
+		if (!Directory.Exists(path))  Directory.CreateDirectory(path);
 
 		_customBasePath = path;
 	}
