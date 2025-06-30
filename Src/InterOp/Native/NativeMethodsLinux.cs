@@ -59,7 +59,5 @@ internal class NativeMethodsLinux : INativeMethods
     public int nsw_search_n(IntPtr index, float[] vector, ushort dims, [Out] InternalMatchResult[] results, int n) => NativeMethodsLinuxStatic.nsw_search_n(index, vector, dims, results, n);
     public int hnsw_search(IntPtr index, float[] vector, ushort dims, [Out] InternalMatchResult result) => NativeMethodsLinuxStatic.hnsw_search(index, vector, dims, result);
     public int hnsw_search_n(IntPtr index, float[] vector, ushort dims, [Out] InternalMatchResult[] results, int n) => NativeMethodsLinuxStatic.hnsw_search_n(index, vector, dims, results, n);
-
-
 }
 
