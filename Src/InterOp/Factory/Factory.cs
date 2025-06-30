@@ -37,13 +37,13 @@ internal static class NativeMethodsFactory
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            Debug.WriteLine("Creando NativeMethodsWindows");
+            Debug.WriteLine("Running NativeMethodsWindows");
             return new NativeMethodsWindows();
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
 
-            Debug.WriteLine("Creando NativeMethodsLinux");
+            Debug.WriteLine("Running NativeMethodsLinux");
             return new NativeMethodsLinux();
         }
 
